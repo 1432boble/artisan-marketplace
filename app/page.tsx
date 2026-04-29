@@ -29,8 +29,12 @@ export default function Home() {
         .select(`
           *,
           profile_services (
-            services ( name_fr )
-          )
+  services ( name_fr )
+),
+reviews (
+  rating,
+  status
+)
         `)
         .eq('status', 'approved');
 
@@ -51,7 +55,9 @@ export default function Home() {
 
     if (serviceFilter) {
       result = result.filter((a) =>
-        a.profile_services?.[0]?.services?.name_fr
+        a.profile_services
+  ?.map((ps: any) => ps.services?.name_fr)
+  .join(' ')
           ?.toLowerCase()
           .includes(serviceFilter.toLowerCase())
       );
@@ -117,10 +123,26 @@ export default function Home() {
       </div>
 
       <p className="mt-4 text-gray-700">{filtered.length} résultat(s)</p>
+      {filtered.length === 0 && (
+  <div className="mt-4 rounded-xl bg-white p-5 text-gray-600 shadow">
+    Aucun artisan trouvé. Essayez un autre service ou une autre zone.
+  </div>
+)}
 
       <div className="mt-4 grid gap-4">
         {filtered.map((a) => {
-          const service = a.profile_services?.[0]?.services?.name_fr;
+          const reviews = a.reviews || [];
+const averageRating =
+  reviews.length > 0
+    ? (
+        reviews.reduce((sum: number, review: any) => sum + review.rating, 0) /
+        reviews.length
+      ).toFixed(1)
+    : null;
+          const services =
+  a.profile_services
+    ?.map((ps: any) => ps.services?.name_fr)
+    .filter(Boolean) || [];
           const whatsappNumber = cleanWhatsappNumber(a.whatsapp);
 
           return (
@@ -141,8 +163,13 @@ export default function Home() {
               </p>
 
               <p className="mt-2 text-sm font-semibold text-blue-700">
-                {service || 'Service non renseigné'}
+                {services.length > 0 ? services.join(', ') : 'Service non renseigné'}
               </p>
+              <p className="mt-1 text-sm font-semibold text-yellow-600">
+  {averageRating
+    ? `⭐ ${averageRating}/5 (${reviews.length} avis)`
+    : 'Aucun avis'}
+</p>
 
               <p className="mt-3 text-gray-800">
                 {a.description || 'Description non renseignée'}
