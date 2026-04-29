@@ -20,10 +20,11 @@ export default function Home() {
   const [filtered, setFiltered] = useState<any[]>([]);
   const [serviceFilter, setServiceFilter] = useState('');
   const [zoneFilter, setZoneFilter] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select(`
           *,
@@ -32,6 +33,11 @@ export default function Home() {
           )
         `)
         .eq('status', 'approved');
+
+      if (error) {
+        setErrorMessage(error.message);
+        return;
+      }
 
       setArtisans(data || []);
       setFiltered(data || []);
@@ -63,53 +69,55 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gray-100 p-4">
       <h1 className="text-3xl font-bold text-gray-900">Artisans</h1>
+
       <p className="mt-1 text-gray-600">
         Trouvez un artisan fiable près de chez vous.
       </p>
 
-      {/* FILTERS */}
-      {/* FILTERS */}
-<div className="mt-4 grid gap-3 rounded-xl bg-white p-4 shadow">
-  <select
-    className="rounded-lg border border-gray-300 bg-white p-3 font-medium text-gray-900"
-    value={serviceFilter}
-    onChange={(e) => setServiceFilter(e.target.value)}
-  >
-    <option value="">Tous les services</option>
-    {Array.from(
-      new Set(
-        artisans
-          .map((a) => a.profile_services?.[0]?.services?.name_fr)
-          .filter(Boolean)
-      )
-    ).map((service) => (
-      <option key={service} value={service}>
-        {service}
-      </option>
-    ))}
-  </select>
+      {errorMessage && (
+        <p className="mt-4 rounded bg-red-100 p-3 text-red-700">
+          Error: {errorMessage}
+        </p>
+      )}
 
-  <select
-    className="rounded-lg border border-gray-300 bg-white p-3 font-medium text-gray-900"
-    value={zoneFilter}
-    onChange={(e) => setZoneFilter(e.target.value)}
-  >
-    <option value="">Toutes les zones</option>
-    {Array.from(
-      new Set(artisans.map((a) => a.main_location).filter(Boolean))
-    ).map((zone) => (
-      <option key={zone} value={zone}>
-        {zone}
-      </option>
-    ))}
-  </select>
-</div>
+      <div className="mt-4 grid gap-3 rounded-xl bg-white p-4 shadow">
+        <select
+          className="rounded-lg border border-gray-300 bg-white p-3 font-medium text-gray-900"
+          value={serviceFilter}
+          onChange={(e) => setServiceFilter(e.target.value)}
+        >
+          <option value="">Tous les services</option>
+          {Array.from(
+            new Set(
+              artisans
+                .map((a) => a.profile_services?.[0]?.services?.name_fr)
+                .filter(Boolean)
+            )
+          ).map((service) => (
+            <option key={service} value={service}>
+              {service}
+            </option>
+          ))}
+        </select>
 
-      <p className="mt-4 text-gray-700">
-        {filtered.length} résultat(s)
-      </p>
+        <select
+          className="rounded-lg border border-gray-300 bg-white p-3 font-medium text-gray-900"
+          value={zoneFilter}
+          onChange={(e) => setZoneFilter(e.target.value)}
+        >
+          <option value="">Toutes les zones</option>
+          {Array.from(
+            new Set(artisans.map((a) => a.main_location).filter(Boolean))
+          ).map((zone) => (
+            <option key={zone} value={zone}>
+              {zone}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      {/* LIST */}
+      <p className="mt-4 text-gray-700">{filtered.length} résultat(s)</p>
+
       <div className="mt-4 grid gap-4">
         {filtered.map((a) => {
           const service = a.profile_services?.[0]?.services?.name_fr;
