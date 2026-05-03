@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { QRCodeCanvas } from 'qrcode.react';
+import { useRouter } from 'next/navigation';
 
 function cleanWhatsappNumber(phone: string) {
   if (!phone) return '';
@@ -18,12 +19,14 @@ function cleanWhatsappNumber(phone: string) {
 
 export default function ProfilePage() {
   const { id } = useParams();
+  const router = useRouter();
   const [profile, setProfile] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
 
   const [name, setName] = useState('');
 const [rating, setRating] = useState(5);
 const [comment, setComment] = useState('');
+const [photos, setPhotos] = useState<any[]>([]);
 
 const submitReview = async () => {
   if (!name || !comment) {
@@ -84,6 +87,13 @@ const submitReview = async () => {
         .order('created_at', { ascending: false });
 
       setReviews(reviewsData || []);
+
+      const { data: photosData } = await supabase
+  .from('portfolio_photos')
+  .select('*')
+  .eq('profile_id', id);
+
+setPhotos(photosData || []);
     };
 
     fetchProfile();
@@ -106,6 +116,13 @@ const submitReview = async () => {
 
   return (
     <main className="min-h-screen bg-gray-100 p-4">
+    
+      <button
+  onClick={() => router.push('/')}
+  className="mb-4 inline-flex items-center gap-2 text-gray-700 font-semibold"
+>
+  ← Retour aux artisans
+</button>
       <div className="rounded-xl bg-white p-6 shadow">
         <h1 className="text-2xl font-bold text-gray-900">
           {profile.company_name || profile.contact_name}
@@ -133,6 +150,36 @@ const submitReview = async () => {
           {profile.description || 'Description non renseignée'}
         </p>
       </div>
+
+      {photos.length > 0 && (
+  <div className="mt-6 rounded-xl bg-white p-4 shadow">
+    <h2 className="mb-3 text-lg font-bold text-gray-900">
+      Réalisations
+    </h2>
+
+    {/* Cover image */}
+    {photos.find(p => p.is_featured) && (
+      <img
+        src={photos.find(p => p.is_featured).photo_url}
+        className="mb-3 w-full rounded-lg object-cover"
+      />
+    )}
+
+    {/* Gallery */}
+    <div className="grid grid-cols-2 gap-2">
+      {photos
+        .filter(p => !p.is_featured)
+        .slice(0, 5)
+        .map((photo) => (
+          <img
+            key={photo.id}
+            src={photo.photo_url.trim()}
+            className="h-32 w-full rounded-lg object-cover"
+          />
+        ))}
+    </div>
+  </div>
+)}
 
       {whatsappNumber && (
         <a
