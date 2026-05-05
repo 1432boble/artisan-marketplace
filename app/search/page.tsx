@@ -80,9 +80,9 @@ export default function Home() {
         >
          ← Retour à l’accueil
         </Link>
-      <h1 className="text-3xl font-bold text-gray-900">Artisans</h1>
+      <h1 className="text-3xl text-center font-bold text-gray-900">Artisans</h1>
 
-      <p className="mt-1 text-gray-700">
+      <p className="mt-1 text-center text-gray-700">
         Trouvez un artisan fiable près de chez vous.
       </p>
 

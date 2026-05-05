@@ -7,20 +7,14 @@ export default function LandingPage() {
         <div className="rounded-2xl bg-white p-6 shadow">
           <p className="mb-3 inline-block rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700">
             Plateforme de confiance
-          </p>
-
-          <h1 className="text-3xl font-bold leading-tight text-gray-900">
+    
+</p>
+<h1 className="text-4xl text-center font-bold leading-tight text-gray-900">
   Biso
 </h1>
 
-<p className="mt-2 text-xl font-semibold text-gray-800">
-  La communauté des pros de confiance.
-</p>
-
-<p className="mt-4 text-lg text-gray-700">
-  Trouvez rapidement un professionnel sérieux près de chez vous.
-  Consultez les avis, les réalisations et contactez directement le bon
-  prestataire par WhatsApp.
+<p className="mt-4 text-center text-lg text-gray-700">
+  Une communauté de professionnels de confiance, recommandés pour leur sérieux, leur savoir-faire et la qualité de leurs réalisations.
 </p>
 
           <div className="mt-6 grid gap-3">
