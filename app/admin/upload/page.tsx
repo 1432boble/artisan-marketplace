@@ -1,12 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-export default function UploadPage() {
+function UploadPageContent() {
   const searchParams = useSearchParams();
   const key = searchParams.get('key');
   const expectedKey = process.env.NEXT_PUBLIC_ADMIN_UPLOAD_KEY;
+
+  const [profiles, setProfiles] = useState<any[]>([]);
+  const [selectedProfile, setSelectedProfile] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
 
   if (key !== expectedKey) {
     return (
@@ -21,22 +26,17 @@ export default function UploadPage() {
     );
   }
 
-  const [profiles, setProfiles] = useState<any[]>([]);
-  const [selectedProfile, setSelectedProfile] = useState('');
-  const [file, setFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
-
   useEffect(() => {
     fetch('/api/get-profiles')
-      .then(res => res.json())
-      .then(data => {
-  if (Array.isArray(data)) {
-    setProfiles(data);
-  } else {
-    alert(data.error || 'Failed to load profiles');
-    setProfiles([]);
-  }
-});
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setProfiles(data);
+        } else {
+          alert(data.error || 'Failed to load profiles');
+          setProfiles([]);
+        }
+      });
   }, []);
 
   const handleUpload = async () => {
@@ -57,7 +57,6 @@ export default function UploadPage() {
     });
 
     const result = await res.json();
-
     setLoading(false);
 
     if (result.success) {
@@ -69,36 +68,54 @@ export default function UploadPage() {
   };
 
   return (
-    <main className="p-6 max-w-md mx-auto">
-      <h1 className="text-xl font-bold mb-4">Upload Photo</h1>
+    <main className="min-h-screen bg-gray-100 p-6 text-gray-900">
+      <div className="mx-auto max-w-md rounded-xl bg-white p-6 shadow">
+        <h1 className="mb-4 text-xl font-bold text-gray-900">Upload Photo</h1>
 
-      <select
-        className="w-full mb-4 p-3 border rounded bg-white text-black"
-  value={selectedProfile}
-  onChange={(e) => setSelectedProfile(e.target.value)}
-      >
-        <option value="" className="text-black">Choisir un artisan</option>
+        <select
+          className="mb-4 w-full rounded border bg-white p-3 text-black"
+          value={selectedProfile}
+          onChange={(e) => setSelectedProfile(e.target.value)}
+        >
+          <option value="" className="text-black">
+            Select artisan
+          </option>
 
-{profiles.map((p) => (
-  <option key={p.id} value={p.id} className="text-black">
-    {p.company_name || p.contact_name}
-  </option>
-        ))}
-      </select>
+          {profiles.map((p) => (
+            <option key={p.id} value={p.id} className="text-black">
+              {p.company_name || p.contact_name}
+            </option>
+          ))}
+        </select>
 
-      <input
-        type="file"
-        className="mb-4"
-        onChange={(e) => setFile(e.target.files?.[0] || null)}
-      />
+        <input
+          type="file"
+          className="mb-4 w-full"
+          onChange={(e) => setFile(e.target.files?.[0] || null)}
+        />
 
-      <button
-        onClick={handleUpload}
-        className="bg-black text-white px-4 py-2 rounded w-full"
-        disabled={loading}
-      >
-        {loading ? 'Uploading...' : 'Upload'}
-      </button>
+        <button
+          onClick={handleUpload}
+          className="w-full rounded bg-gray-900 px-4 py-2 font-semibold text-white"
+          disabled={loading}
+        >
+          {loading ? 'Uploading...' : 'Upload'}
+        </button>
+      </div>
     </main>
+  );
+}
+
+export default function UploadPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-gray-100 p-6">
+          <p className="text-gray-700">Chargement...</p>
+        </main>
+      }
+    >
+      <UploadPageContent />
+    </Suspense>
   );
 }
