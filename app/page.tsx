@@ -10,21 +10,25 @@ export default function LandingPage() {
           </p>
 
           <h1 className="text-3xl font-bold leading-tight text-gray-900">
-            Trouvez un artisan fiable près de chez vous
-          </h1>
+  Biso
+</h1>
 
-          <p className="mt-4 text-lg text-gray-700">
-            Recherchez des artisans et entreprises par service, zone et avis
-            client. Consultez leurs réalisations, contactez-les facilement et
-            partagez leur profil par WhatsApp.
-          </p>
+<p className="mt-2 text-xl font-semibold text-gray-800">
+  La communauté des pros de confiance.
+</p>
+
+<p className="mt-4 text-lg text-gray-700">
+  Trouvez rapidement un professionnel sérieux près de chez vous.
+  Consultez les avis, les réalisations et contactez directement le bon
+  prestataire par WhatsApp.
+</p>
 
           <div className="mt-6 grid gap-3">
             <Link
               href="/search"
               className="block rounded-xl bg-gray-900 px-5 py-4 text-center text-lg font-bold text-white"
             >
-              Je cherche un artisan
+              Je cherche un pro
             </Link>
 
             <a

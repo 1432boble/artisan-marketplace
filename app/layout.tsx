@@ -13,10 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Artisans",
-  description: "Trouvez des artisans fiables près de chez vous.",
+  title: "Biso",
+  description: "La communauté des pros de confiance près de chez vous.",
   manifest: "/manifest.json",
-  themeColor: "#111827",
 };
 
 export default function RootLayout({
@@ -26,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="fr"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
