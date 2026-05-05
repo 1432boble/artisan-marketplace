@@ -14,6 +14,20 @@ function cleanWhatsappNumber(phone: string) {
   return cleaned;
 }
 
+function cleanCallNumber(phone: string) {
+  if (!phone) return '';
+
+  const firstNumber = phone.split('/')[0].trim();
+  let cleaned = firstNumber.replace(/\D/g, '');
+
+  // For normal local calls in Côte d'Ivoire, remove country code if present
+  if (cleaned.startsWith('225') && cleaned.length > 10) {
+    cleaned = cleaned.substring(3);
+  }
+
+  return cleaned;
+}
+
 function renderStars(rating: number) {
   return '★'.repeat(rating) + '☆'.repeat(5 - rating);
 }
@@ -60,6 +74,7 @@ export default function ProfilePage() {
   if (!profile) return <p className="p-4 text-gray-900">Chargement...</p>;
 
   const whatsappNumber = cleanWhatsappNumber(profile.whatsapp);
+  const callNumber = cleanCallNumber(profile.whatsapp || profile.phone);
   const averageRating =
     reviews.length > 0
       ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
@@ -119,15 +134,26 @@ export default function ProfilePage() {
         </p>
       </div>
 
-      {whatsappNumber && (
-        <a
-          href={`https://wa.me/${whatsappNumber}?text=Bonjour, je vous ai trouvé via la plateforme et je souhaite discuter de vos services.`}
-          target="_blank"
-          className="mt-4 block rounded-lg bg-green-600 px-4 py-3 text-center font-semibold text-white"
-        >
-          Contacter sur WhatsApp
-        </a>
-      )}
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+  {whatsappNumber && (
+    <a
+      href={`https://wa.me/${whatsappNumber}?text=Bonjour, je vous ai trouvé via Biso et je souhaite discuter de vos services.`}
+      target="_blank"
+      className="block rounded-lg bg-green-600 px-4 py-3 text-center font-semibold text-white"
+    >
+      WhatsApp
+    </a>
+  )}
+
+  {callNumber && (
+    <a
+      href={`tel:${callNumber}`}
+      className="block rounded-lg bg-gray-900 px-4 py-3 text-center font-semibold text-white"
+    >
+      Appeler
+    </a>
+  )}
+</div>
 
       <div className="mt-6 rounded-xl bg-white p-5 shadow">
         <h2 className="mb-3 text-lg font-bold text-gray-900">Réalisations</h2>
