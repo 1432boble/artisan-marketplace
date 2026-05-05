@@ -5,10 +5,7 @@ export default function LandingPage() {
     <main className="min-h-screen bg-gray-100 text-gray-900">
       <section className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center px-5 py-10">
         <div className="rounded-2xl bg-white p-6 shadow">
-          <p className="mb-3 inline-block rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700">
-            Plateforme de confiance
-    
-</p>
+          
 <h1 className="text-4xl text-center font-bold leading-tight text-gray-900">
   Biso
 </h1>
@@ -57,10 +54,10 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <p className="mt-5 text-center text-sm text-gray-500">
-          Une plateforme simple pour découvrir, vérifier et contacter des
-          prestataires de confiance.
-        </p>
+        <p className="mb-3 text-center inline-block rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700">
+            Plateforme de confiance
+    
+</p>
       </section>
     </main>
   );
