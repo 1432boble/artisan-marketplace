@@ -71,9 +71,14 @@ export default function ProfilePage() {
     const fetchData = async () => {
       const { data: profileData } = await supabase
         .from('profiles')
-        .select('*')
-        .eq('id', id)
-        .single();
+        .select(`
+          *,
+        profile_services (
+          services ( name_fr )
+        )
+   `)
+   .eq('id', id)
+   .single();
 
       setProfile(profileData);
 
@@ -216,7 +221,12 @@ const hasCategoryAverages = Object.values(categoryAverages).some(
 
       <div className="mt-4 rounded-xl bg-white p-5 shadow">
         <p className="text-sm font-semibold text-blue-700">
-          {profile.main_service_name || 'Service non renseigné'}
+          {profile.profile_services?.length > 0
+  ? profile.profile_services
+      .map((ps: any) => ps.services?.name_fr)
+      .filter(Boolean)
+      .join(', ')
+  : 'Service non renseigné'}
         </p>
 
         <StarRating rating={averageRating} count={reviews.length} />
