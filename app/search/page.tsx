@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import StarRating from '@/components/StarRating';
 
 function cleanWhatsappNumber(phone: string) {
   if (!phone) return '';
@@ -193,11 +194,10 @@ export default function Home() {
                 {services.length > 0 ? services.join(', ') : 'Service non renseigné'}
               </p>
 
-              <p className="mt-1 text-sm font-semibold text-yellow-600">
-                {averageRating
-                  ? `⭐ ${averageRating}/5 (${approvedReviews.length} avis)`
-                  : 'Aucun avis'}
-              </p>
+              <StarRating
+                rating={averageRating ? Number(averageRating) : null}
+                count={approvedReviews.length}
+              />
 
               <p className="mt-3 text-gray-800">
                 {a.description || 'Description non renseignée'}
