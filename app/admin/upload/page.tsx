@@ -1,8 +1,26 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 export default function UploadPage() {
+  const searchParams = useSearchParams();
+  const key = searchParams.get('key');
+  const expectedKey = process.env.NEXT_PUBLIC_ADMIN_UPLOAD_KEY;
+
+  if (key !== expectedKey) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-gray-100 p-6">
+        <div className="rounded-xl bg-white p-6 text-center shadow">
+          <h1 className="text-xl font-bold text-gray-900">Accès non autorisé</h1>
+          <p className="mt-2 text-gray-600">
+            Cette page est réservée à l’administrateur.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
   const [profiles, setProfiles] = useState<any[]>([]);
   const [selectedProfile, setSelectedProfile] = useState('');
   const [file, setFile] = useState<File | null>(null);
