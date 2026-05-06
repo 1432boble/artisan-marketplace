@@ -7,13 +7,18 @@ import StarRating from '@/components/StarRating';
 
 function cleanWhatsappNumber(phone: string) {
   if (!phone) return '';
+
   const firstNumber = phone.split('/')[0].trim();
   let cleaned = firstNumber.replace(/\D/g, '');
 
-  if (cleaned.startsWith('0')) cleaned = '225' + cleaned.substring(1);
-  if (!cleaned.startsWith('225')) cleaned = '225' + cleaned;
+  // If saved as +225XXXXXXXXXX or 225XXXXXXXXXX, keep it.
+  if (cleaned.startsWith('225')) return cleaned;
 
-  return cleaned;
+  // Côte d’Ivoire local mobile numbers are 10 digits and often start with 01, 05, 07, etc.
+  // For WhatsApp, use country code + full local number without the plus sign.
+  if (cleaned.startsWith('0')) return '225' + cleaned;
+
+  return '225' + cleaned;
 }
 
 export default function Home() {
