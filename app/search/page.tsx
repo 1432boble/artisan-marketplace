@@ -185,10 +185,14 @@ export default function Home() {
                 )}
               </div>
 
-              <p className="mt-2 text-sm text-gray-700">
-                📍 {a.main_location || 'Zone non renseignée'} •{' '}
-                {a.experience_years || 'Expérience non renseignée'}
-              </p>
+              <div className="mt-2 space-y-1 text-sm text-gray-700">
+  <p>
+    📍 Zone couverte : {a.main_location || 'Zone non renseignée'}
+  </p>
+  <p>
+    Expérience : {a.experience_years || 'Expérience non renseignée'}
+  </p>
+</div>
 
               <p className="mt-2 text-sm font-semibold text-blue-700">
                 {services.length > 0 ? services.join(', ') : 'Service non renseigné'}

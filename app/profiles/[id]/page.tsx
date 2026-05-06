@@ -54,8 +54,6 @@ export default function ProfilePage() {
   const [photos, setPhotos] = useState<any[]>([]);
 
   const [clientName, setClientName] = useState('');
-  const [serviceReceived, setServiceReceived] = useState('');
-  const [approximateDate, setApproximateDate] = useState('');
   const [qualityRating, setQualityRating] = useState(5);
   const [cleanlinessRating, setCleanlinessRating] = useState(5);
   const [timelinessRating, setTimelinessRating] = useState(5);
@@ -146,8 +144,6 @@ const hasCategoryAverages = Object.values(categoryAverages).some(
     const { error } = await supabase.from('reviews').insert({
       profile_id: id,
       client_name: clientName,
-      service_received: serviceReceived,
-      approximate_date: approximateDate,
       quality_rating: qualityRating,
       cleanliness_rating: cleanlinessRating,
       timeliness_rating: timelinessRating,
@@ -170,8 +166,6 @@ const hasCategoryAverages = Object.values(categoryAverages).some(
     alert('Merci. Votre avis sera publié après vérification.');
 
     setClientName('');
-    setServiceReceived('');
-    setApproximateDate('');
     setQualityRating(5);
     setCleanlinessRating(5);
     setTimelinessRating(5);
@@ -213,10 +207,14 @@ const hasCategoryAverages = Object.values(categoryAverages).some(
           </span>
         )}
 
-        <p className="mt-2 text-gray-700">
-          📍 {profile.main_location || 'Zone non renseignée'} •{' '}
-          {profile.experience_years || 'Expérience non renseignée'}
-        </p>
+        <div className="mt-2 space-y-1 text-gray-700">
+  <p>
+    📍 Zone couverte : {profile.main_location || 'Zone non renseignée'}
+  </p>
+  <p>
+    Expérience : {profile.experience_years || 'Expérience non renseignée'}
+  </p>
+</div>
       </div>
 
       <div className="mt-4 rounded-xl bg-white p-5 shadow">
@@ -380,20 +378,7 @@ const hasCategoryAverages = Object.values(categoryAverages).some(
           onChange={(e) => setClientName(e.target.value)}
         />
 
-        <input
-          placeholder="Service reçu (ex: peinture, plomberie...)"
-          className="mb-3 w-full rounded border border-gray-300 bg-white p-3 text-gray-900"
-          value={serviceReceived}
-          onChange={(e) => setServiceReceived(e.target.value)}
-        />
-
-        <input
-          placeholder="Date approximative du service"
-          className="mb-3 w-full rounded border border-gray-300 bg-white p-3 text-gray-900"
-          value={approximateDate}
-          onChange={(e) => setApproximateDate(e.target.value)}
-        />
-
+        
         <RatingSelect
           label="Qualité du travail"
           value={qualityRating}
