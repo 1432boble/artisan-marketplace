@@ -164,26 +164,32 @@ export default function Home() {
           return (
             <div key={a.id} className="rounded-xl bg-white p-5 shadow">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">
-                  {a.profile_type === 'company' ? a.company_name : a.contact_name}
-                </h2>
+  <div className="flex items-start justify-between gap-3">
+    <h2 className="text-xl font-bold text-gray-900">
+      {a.profile_type === 'company' ? a.company_name : a.contact_name}
+    </h2>
 
-                <p className="mt-1 text-sm font-semibold text-gray-700">
-                  {a.profile_type === 'company'
-                    ? `Contact: ${a.contact_name}`
-                    : a.company_name || 'Artisan indépendant'}
-                </p>
+    <span className="shrink-0 rounded bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">
+      {a.profile_type === 'company' ? 'Entreprise' : 'Artisan'}
+    </span>
+  </div>
 
-                <span className="mt-2 inline-block rounded bg-gray-100 px-2 py-1 text-xs text-gray-700">
-                  {a.profile_type === 'company' ? 'Entreprise' : 'Artisan'}
-                </span>
+  <p className="mt-1 text-sm font-semibold text-gray-700">
+    {a.profile_type === 'company'
+      ? `Contact: ${a.contact_name}`
+      : a.company_name || 'Artisan indépendant'}
+  </p>
 
-                {a.is_verified && (
-                  <span className="ml-2 inline-block rounded bg-blue-100 px-2 py-1 text-xs text-blue-700">
-                    Vérifié
-                  </span>
-                )}
-              </div>
+  <p className="mt-2 text-sm font-semibold text-blue-700">
+    {services.length > 0 ? services.join(', ') : 'Service non renseigné'}
+  </p>
+
+  {a.is_verified && (
+    <span className="mt-2 inline-block rounded bg-blue-100 px-2 py-1 text-xs text-blue-700">
+      Vérifié
+    </span>
+  )}
+</div>
 
               <div className="mt-2 space-y-1 text-sm text-gray-700">
   <p>
@@ -194,10 +200,7 @@ export default function Home() {
   </p>
 </div>
 
-              <p className="mt-2 text-sm font-semibold text-blue-700">
-                {services.length > 0 ? services.join(', ') : 'Service non renseigné'}
-              </p>
-
+              
               <StarRating
                 rating={averageRating ? Number(averageRating) : null}
                 count={approvedReviews.length}

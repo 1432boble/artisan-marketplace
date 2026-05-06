@@ -185,37 +185,39 @@ const hasCategoryAverages = Object.values(categoryAverages).some(
       </button>
 
       <div className="rounded-xl bg-white p-5 shadow">
-        <h1 className="text-2xl font-bold text-gray-900">
-          {profile.profile_type === 'company'
-            ? profile.company_name
-            : profile.contact_name}
-        </h1>
+  <div className="flex items-start justify-between gap-3">
+    <h1 className="text-2xl font-bold text-gray-900">
+      {profile.profile_type === 'company'
+        ? profile.company_name
+        : profile.contact_name}
+    </h1>
 
-        <p className="mt-1 text-sm font-semibold text-gray-700">
-          {profile.profile_type === 'company'
-            ? `Contact: ${profile.contact_name}`
-            : profile.company_name || 'Artisan indépendant'}
-        </p>
+    <span className="shrink-0 rounded bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">
+      {profile.profile_type === 'company' ? 'Entreprise' : 'Artisan'}
+    </span>
+  </div>
 
-        <span className="mt-2 inline-block rounded bg-gray-100 px-2 py-1 text-xs text-gray-700">
-          {profile.profile_type === 'company' ? 'Entreprise' : 'Artisan'}
-        </span>
-
-        {profile.is_verified && (
-          <span className="ml-2 inline-block rounded bg-blue-100 px-2 py-1 text-xs text-blue-700">
-            Vérifié
-          </span>
-        )}
-
-        <div className="mt-2 space-y-1 text-gray-700">
-  <p>
-    📍 Zone couverte : {profile.main_location || 'Zone non renseignée'}
+  <p className="mt-1 text-sm font-semibold text-gray-700">
+    {profile.profile_type === 'company'
+      ? `Contact: ${profile.contact_name}`
+      : profile.company_name || 'Artisan indépendant'}
   </p>
-  <p>
-    Expérience : {profile.experience_years || 'Expérience non renseignée'}
-  </p>
+
+  {profile.is_verified && (
+    <span className="mt-2 inline-block rounded bg-blue-100 px-2 py-1 text-xs text-blue-700">
+      Vérifié
+    </span>
+  )}
+
+  <div className="mt-2 space-y-1 text-gray-700">
+    <p>
+      📍 Zone couverte : {profile.main_location || 'Zone non renseignée'}
+    </p>
+    <p>
+      Expérience : {profile.experience_years || 'Expérience non renseignée'}
+    </p>
+  </div>
 </div>
-      </div>
 
       <div className="mt-4 rounded-xl bg-white p-5 shadow">
         <p className="text-sm font-semibold text-blue-700">
