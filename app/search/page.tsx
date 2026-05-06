@@ -5,6 +5,63 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import StarRating from '@/components/StarRating';
 
+const SERVICE_OPTIONS = [
+  'Peinture',
+  'Ferraillage',
+  'Nettoyage',
+  'Froid & Climatisation',
+  'Électricité',
+  'Menuiserie bois',
+  'Carrelage',
+  'Plomberie',
+  'Plâtrerie (Plaquiste)',
+  'Menuiserie aluminium',
+  'Étanchéité',
+  'Couture / Tailleur',
+  'Panneaux solaires',
+  'Maçonnerie',
+  'Mécanique',
+];
+
+const ZONE_OPTIONS = [
+  'Tout Abidjan',
+  'Toute la Côte d’Ivoire',
+
+  'Abengourou',
+  'Abidjan-Abobo',
+  'Abidjan-Adjamé',
+  'Abidjan-Anyama',
+  'Abidjan-Attecoubé',
+  'Abidjan-Bingerville',
+  'Abidjan-Cocody',
+  'Abidjan-Koumassi',
+  'Abidjan-Marcory',
+  'Abidjan-Plateau',
+  'Abidjan-Port-Bouët',
+  'Abidjan-Treichville',
+  'Abidjan-Yopougon',
+  'Aboisso',
+  'Agboville',
+  'Bondoukou',
+  'Bouaflé',
+  'Bouaké',
+  'Daoukro',
+  'Daloa',
+  'Divo',
+  'Ferkessédougou',
+  'Gagnoa',
+  'Grand-Bassam',
+  'Issia',
+  'Korhogo',
+  'Man',
+  'Odienné',
+  'San-Pédro',
+  'Séguéla',
+  'Soubré',
+  'Tiassalé',
+  'Yamoussoukro',
+];
+
 function cleanWhatsappNumber(phone: string) {
   if (!phone) return '';
 
@@ -50,33 +107,38 @@ export default function Home() {
       }
 
       setArtisans(data || []);
-      setFiltered(data || []);
+      setFiltered([]);
     };
 
     fetchData();
   }, []);
 
-  useEffect(() => {
-    let result = artisans;
+useEffect(() => {
+  if (!serviceFilter && !zoneFilter) {
+    setFiltered([]);
+    return;
+  }
 
-    if (serviceFilter) {
-      result = result.filter((a) =>
-        a.profile_services
-          ?.map((ps: any) => ps.services?.name_fr)
-          .join(' ')
-          .toLowerCase()
-          .includes(serviceFilter.toLowerCase())
-      );
-    }
+  let result = artisans;
 
-    if (zoneFilter) {
-      result = result.filter((a) =>
-        a.main_location?.toLowerCase().includes(zoneFilter.toLowerCase())
-      );
-    }
+  if (serviceFilter && serviceFilter !== 'ALL_SERVICES') {
+    result = result.filter((a) =>
+      a.profile_services
+        ?.map((ps: any) => ps.services?.name_fr)
+        .join(' ')
+        .toLowerCase()
+        .includes(serviceFilter.toLowerCase())
+    );
+  }
 
-    setFiltered(result);
-  }, [serviceFilter, zoneFilter, artisans]);
+  if (zoneFilter && zoneFilter !== 'ALL_ZONES') {
+    result = result.filter((a) =>
+      a.main_location?.toLowerCase().includes(zoneFilter.toLowerCase())
+    );
+  }
+
+  setFiltered(result);
+}, [serviceFilter, zoneFilter, artisans]);
 
   return (
     <main className="min-h-screen bg-gray-100 p-4 text-gray-900">
@@ -86,10 +148,10 @@ export default function Home() {
         >
          ← Retour à l’accueil
         </Link>
-      <h1 className="text-3xl text-center font-bold text-gray-900">Artisans</h1>
+      <h1 className="text-2xl text-center font-bold text-gray-900">Commencez votre recherche</h1>
 
       <p className="mt-1 text-center text-gray-700">
-        Trouvez un artisan fiable près de chez vous.
+        Choisissez un service, une zone/ville, ou les deux pour lancer la recherche.
       </p>
 
       {errorMessage && (
@@ -104,20 +166,13 @@ export default function Home() {
           value={serviceFilter}
           onChange={(e) => setServiceFilter(e.target.value)}
         >
-          <option value="">Tous les services</option>
-          {Array.from(
-            new Set(
-              artisans
-                .flatMap((a) =>
-                  a.profile_services?.map((ps: any) => ps.services?.name_fr)
-                )
-                .filter(Boolean)
-            )
-          ).map((service: any) => (
-            <option key={service} value={service}>
-              {service}
-            </option>
-          ))}
+          <option value="">Choisir un service</option>
+          <option value="ALL_SERVICES">Tous les services</option>
+          {SERVICE_OPTIONS.map((service) => (
+  <option key={service} value={service}>
+    {service}
+  </option>
+))}
         </select>
 
         <select
@@ -125,24 +180,44 @@ export default function Home() {
           value={zoneFilter}
           onChange={(e) => setZoneFilter(e.target.value)}
         >
-          <option value="">Toutes les zones</option>
-          {Array.from(
-            new Set(artisans.map((a) => a.main_location).filter(Boolean))
-          ).map((zone: any) => (
-            <option key={zone} value={zone}>
-              {zone}
-            </option>
-          ))}
+         <option value="">Choisir une zone / ville</option>
+         <option value="ALL_ZONES">Toutes les zones / villes</option>
+         {ZONE_OPTIONS.map((zone) => (
+  <option key={zone} value={zone}>
+    {zone}
+  </option>
+))}
         </select>
       </div>
 
-      <p className="mt-4 text-gray-700">{filtered.length} résultat(s)</p>
+      {(serviceFilter || zoneFilter) && (
+  <p className="mt-4 text-gray-700">{filtered.length} résultat(s)</p>
+)}
 
-      {filtered.length === 0 && (
-        <div className="mt-4 rounded-xl bg-white p-5 text-gray-600 shadow">
-          Aucun artisan trouvé. Essayez un autre service ou une autre zone.
-        </div>
-      )}
+      {!serviceFilter && !zoneFilter && (
+  <div className="mt-4 rounded-xl bg-white p-5 shadow">
+    
+  </div>
+)}
+
+{(serviceFilter || zoneFilter) && filtered.length === 0 && (
+  <div className="mt-4 rounded-xl bg-white p-5 shadow">
+    <h2 className="text-lg font-bold text-gray-900">
+      Aucun professionnel trouvé pour le moment
+    </h2>
+
+    <p className="mt-2 text-gray-700">
+      Nous n’avons pas encore de professionnel disponible
+      {serviceFilter ? ` pour ${serviceFilter}` : ''}
+      {zoneFilter ? ` dans la zone : ${zoneFilter}` : ''}.
+    </p>
+
+    <p className="mt-3 text-sm text-gray-600">
+      Biso continue d’ajouter de nouveaux professionnels de confiance.
+      Revenez bientôt ou recommandez-nous un artisan ou une entreprise dans cette zone.
+    </p>
+  </div>
+)}
 
       <div className="mt-4 grid gap-4">
         {filtered.map((a) => {
