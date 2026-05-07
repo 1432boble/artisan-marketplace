@@ -17,9 +17,6 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // TEMP: log what we get
-    console.log('Profiles:', data);
-
     // Filter in JS (safer for now)
     const approved = data?.filter(p => p.status === 'approved') || [];
 
