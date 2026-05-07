@@ -27,7 +27,7 @@ export default function LandingPage() {
             </Link>
 
             <a
-              href="https://forms.gle/jgqDUa2cYojaSkzH6"
+              href="https://forms.gle/Km1Cq9u8BAJPYHys7"
               target="_blank"
               className="block rounded-xl border border-gray-300 bg-white px-5 py-4 text-center text-lg font-bold text-gray-900"
             >
@@ -57,18 +57,6 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="mt-5 border-t pt-5 text-center">
-            <p className="font-semibold text-gray-900">
-              Rejoignez la communauté des pros de confiance
-            </p>
-            <a
-              href="https://forms.gle/Km1Cq9u8BAJPYHys7"
-              target="_blank"
-              className="mt-3 inline-block rounded-xl bg-gray-900 px-5 py-3 font-bold text-white"
-            >
-              Rejoindre Biso
-            </a>
-          </div>
         </div>
 
         <p className="mb-3 text-center inline-block rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700">
