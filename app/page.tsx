@@ -14,10 +14,6 @@ export default function LandingPage() {
   Une communauté de professionnels de confiance, recommandés pour leur sérieux, leur savoir-faire et la qualité de leurs réalisations.
 </p>
 
-<p className="mt-2 text-center text-sm text-gray-500">
-  Biso signifie «nous» — parce que la confiance se construit ensemble.
-</p>
-
           <div className="mt-6 grid gap-3">
             <Link
               href="/search"
@@ -59,10 +55,9 @@ export default function LandingPage() {
 
         </div>
 
-        <p className="mb-3 text-center inline-block rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700">
-            Plateforme de confiance
-    
-</p>
+        <p className="mt-3 text-center text-sm text-gray-500">
+          Biso signifie «nous» — parce que la confiance se construit ensemble.
+        </p>
       </section>
     </main>
   );
