@@ -107,7 +107,6 @@ export default function Home() {
       }
 
       setArtisans(data || []);
-      setFiltered([]);
     };
 
     fetchData();
@@ -115,7 +114,7 @@ export default function Home() {
 
 useEffect(() => {
   if (!serviceFilter && !zoneFilter) {
-    setFiltered([]);
+    setFiltered(artisans);
     return;
   }
 
@@ -148,7 +147,7 @@ useEffect(() => {
         >
          ← Retour à l’accueil
         </Link>
-      <h1 className="text-2xl text-center font-bold text-gray-900">Commencez votre recherche</h1>
+      <h1 className="text-2xl text-center font-bold text-gray-900">Quel pro cherchez-vous ?</h1>
 
       <p className="mt-1 text-center text-gray-700">
         Choisissez un service, une zone/ville, ou les deux pour lancer la recherche.
@@ -190,15 +189,7 @@ useEffect(() => {
         </select>
       </div>
 
-      {(serviceFilter || zoneFilter) && (
-  <p className="mt-4 text-gray-700">{filtered.length} résultat(s)</p>
-)}
-
-      {!serviceFilter && !zoneFilter && (
-  <div className="mt-4 rounded-xl bg-white p-5 shadow">
-    
-  </div>
-)}
+      <p className="mt-4 text-gray-700">{filtered.length} résultat(s)</p>
 
 {(serviceFilter || zoneFilter) && filtered.length === 0 && (
   <div className="mt-4 rounded-xl bg-white p-5 shadow">
