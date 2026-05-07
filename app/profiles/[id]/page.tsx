@@ -301,7 +301,7 @@ const hasCategoryAverages = Object.values(categoryAverages).some(
         <h2 className="mb-3 text-center text-lg font-bold text-gray-900">Réalisations</h2>
 
         {photos.length === 0 ? (
-          <p className="text-center text-gray-600">Aucune photo disponible</p>
+          <p className="text-center text-gray-600">Photos à venir — ce professionnel prépare ses réalisations.</p>
         ) : (
           <div className="grid grid-cols-2 gap-3">
             {photos.map((p) => (

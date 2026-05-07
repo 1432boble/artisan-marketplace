@@ -14,7 +14,7 @@ export default function StarRating({
 
   if (!count || count === 0) {
     return (
-      <p className="mt-2 text-sm font-semibold text-amber-600">
+      <p className="mt-2 text-sm font-semibold text-gray-400">
         Aucun avis
       </p>
     );
