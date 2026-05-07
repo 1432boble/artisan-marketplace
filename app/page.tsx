@@ -14,6 +14,10 @@ export default function LandingPage() {
   Une communauté de professionnels de confiance, recommandés pour leur sérieux, leur savoir-faire et la qualité de leurs réalisations.
 </p>
 
+<p className="mt-2 text-center text-sm text-gray-500">
+  Biso signifie «nous» — parce que la confiance se construit ensemble.
+</p>
+
           <div className="mt-6 grid gap-3">
             <Link
               href="/search"
@@ -51,6 +55,19 @@ export default function LandingPage() {
               <p className="font-bold text-gray-900">📲 Contact WhatsApp</p>
               <p>Contactez directement l’artisan ou l’entreprise.</p>
             </div>
+          </div>
+
+          <div className="mt-5 border-t pt-5 text-center">
+            <p className="font-semibold text-gray-900">
+              Rejoignez la communauté des pros de confiance
+            </p>
+            <a
+              href="https://forms.gle/Km1Cq9u8BAJPYHys7"
+              target="_blank"
+              className="mt-3 inline-block rounded-xl bg-gray-900 px-5 py-3 font-bold text-white"
+            >
+              Rejoindre Biso
+            </a>
           </div>
         </div>
 
