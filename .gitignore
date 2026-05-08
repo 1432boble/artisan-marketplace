@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local config / secrets
+.claude/
+.mcp.json
+biso_design_spec.docx

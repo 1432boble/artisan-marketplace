@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import StarRating from '@/components/StarRating';
 import { cleanWhatsappNumber } from '@/lib/whatsapp';
+import { ArrowLeft, ChevronDown, MapPin } from 'lucide-react';
 
 const SERVICE_OPTIONS = [
   'Peinture',
@@ -24,51 +25,85 @@ const SERVICE_OPTIONS = [
   'Mécanique',
 ];
 
-const ZONE_OPTIONS = [
-  'Tout Abidjan',
-  'Toute la Côte d’Ivoire',
-
-  'Abengourou',
-  'Abidjan-Abobo',
-  'Abidjan-Adjamé',
-  'Abidjan-Anyama',
-  'Abidjan-Attecoubé',
-  'Abidjan-Bingerville',
-  'Abidjan-Cocody',
-  'Abidjan-Koumassi',
-  'Abidjan-Marcory',
-  'Abidjan-Plateau',
-  'Abidjan-Port-Bouët',
-  'Abidjan-Treichville',
-  'Abidjan-Yopougon',
-  'Aboisso',
-  'Agboville',
-  'Bondoukou',
-  'Bouaflé',
-  'Bouaké',
-  'Daoukro',
-  'Daloa',
-  'Divo',
-  'Ferkessédougou',
-  'Gagnoa',
-  'Grand-Bassam',
-  'Issia',
-  'Korhogo',
-  'Man',
-  'Odienné',
-  'San-Pédro',
-  'Séguéla',
-  'Soubré',
-  'Tiassalé',
-  'Yamoussoukro',
+const SERVICE_SELECT_OPTIONS = [
+  { label: 'Tous les services', value: 'ALL_SERVICES' },
+  ...SERVICE_OPTIONS.map((s) => ({ label: s, value: s })),
 ];
 
+const ZONE_SELECT_OPTIONS = [
+  { label: 'Tout Abidjan', value: 'Abidjan' },
+  { label: "Toute la Côte d'Ivoire", value: 'ALL_ZONES' },
+];
 
-export default function Home() {
+function CustomSelect({
+  value,
+  onChange,
+  options,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { label: string; value: string }[];
+  placeholder: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, []);
+
+  const selectedLabel = options.find((o) => o.value === value)?.label;
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-center justify-between rounded-xl border-[1.5px] border-brand bg-white px-4 py-3 font-[400] text-brand"
+      >
+        <span className={selectedLabel ? '' : 'opacity-60'}>{selectedLabel || placeholder}</span>
+        <ChevronDown
+          size={16}
+          className={`shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 right-0 top-full z-20 mt-1 overflow-hidden rounded-xl border border-border bg-white shadow-lg">
+          {options.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => {
+                onChange(opt.value);
+                setOpen(false);
+              }}
+              className={`w-full px-4 py-3 text-left text-sm hover:bg-brand-light ${
+                value === opt.value ? 'font-[500] text-brand' : 'font-[400] text-ink'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+type TypeFilter = 'all' | 'artisan' | 'company';
+
+export default function SearchPage() {
   const [artisans, setArtisans] = useState<any[]>([]);
   const [filtered, setFiltered] = useState<any[]>([]);
   const [serviceFilter, setServiceFilter] = useState('');
   const [zoneFilter, setZoneFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
@@ -98,196 +133,219 @@ export default function Home() {
     fetchData();
   }, []);
 
-useEffect(() => {
-  if (!serviceFilter && !zoneFilter) {
-    setFiltered(artisans);
-    return;
-  }
+  useEffect(() => {
+    if (!serviceFilter && !zoneFilter && typeFilter === 'all') {
+      setFiltered(artisans);
+      return;
+    }
 
-  let result = artisans;
+    let result = artisans;
 
-  if (serviceFilter && serviceFilter !== 'ALL_SERVICES') {
-    result = result.filter((a) =>
-      a.profile_services
-        ?.map((ps: any) => ps.services?.name_fr)
-        .join(' ')
-        .toLowerCase()
-        .includes(serviceFilter.toLowerCase())
-    );
-  }
+    if (serviceFilter && serviceFilter !== 'ALL_SERVICES') {
+      result = result.filter((a) =>
+        a.profile_services
+          ?.map((ps: any) => ps.services?.name_fr)
+          .join(' ')
+          .toLowerCase()
+          .includes(serviceFilter.toLowerCase())
+      );
+    }
 
-  if (zoneFilter && zoneFilter !== 'ALL_ZONES') {
-    result = result.filter((a) =>
-      a.main_location?.toLowerCase().includes(zoneFilter.toLowerCase())
-    );
-  }
+    if (zoneFilter && zoneFilter !== 'ALL_ZONES') {
+      result = result.filter((a) =>
+        a.main_location?.toLowerCase().includes(zoneFilter.toLowerCase())
+      );
+    }
 
-  setFiltered(result);
-}, [serviceFilter, zoneFilter, artisans]);
+    if (typeFilter !== 'all') {
+      result = result.filter((a) => a.profile_type === typeFilter);
+    }
+
+    setFiltered(result);
+  }, [serviceFilter, zoneFilter, typeFilter, artisans]);
+
+  const TYPE_CHIPS: { value: TypeFilter; label: string }[] = [
+    { value: 'all', label: 'Tous' },
+    { value: 'artisan', label: 'Artisan' },
+    { value: 'company', label: 'Entreprise' },
+  ];
 
   return (
-    <main className="min-h-screen bg-gray-100 p-4 text-gray-900">
+    <main className="min-h-screen bg-bg">
+
+      {/* Sticky header */}
+      <div className="sticky top-0 z-10 bg-white px-4 pb-3 pt-4 shadow-sm">
         <Link
           href="/"
-          className="mb-4 inline-block font-semibold text-gray-700"
+          className="mb-3 inline-flex items-center gap-1.5 text-sm font-[400] text-[#888888]"
         >
-         ← Retour à l’accueil
+          <ArrowLeft size={15} />
+          Retour à l'accueil
         </Link>
-      <h1 className="text-2xl text-center font-bold text-gray-900">Quel pro cherchez-vous ?</h1>
 
-      <p className="mt-1 text-center text-gray-700">
-        Choisissez un service, une zone/ville, ou les deux pour lancer la recherche.
-      </p>
-
-      {errorMessage && (
-        <p className="mt-4 rounded bg-red-100 p-3 text-red-700">
-          Error: {errorMessage}
+        <h1 className="text-center text-2xl font-[500] text-ink">
+          Quel pro cherchez-vous ?
+        </h1>
+        <p className="mt-1 text-center text-sm font-[300] text-[#555555]">
+          Choisissez un service, une zone/ville, ou les deux pour lancer la recherche.
         </p>
-      )}
 
-      <div className="mt-4 grid gap-3 rounded-xl bg-white p-4 shadow">
-        <select
-          className="rounded-lg border border-gray-300 bg-white p-3 font-medium text-gray-900"
-          value={serviceFilter}
-          onChange={(e) => setServiceFilter(e.target.value)}
-        >
-          <option value="">Choisir un service</option>
-          <option value="ALL_SERVICES">Tous les services</option>
-          {SERVICE_OPTIONS.map((service) => (
-  <option key={service} value={service}>
-    {service}
-  </option>
-))}
-        </select>
+        <div className="mt-3 grid gap-2">
+          <CustomSelect
+            value={serviceFilter}
+            onChange={setServiceFilter}
+            options={SERVICE_SELECT_OPTIONS}
+            placeholder="Choisir un service"
+          />
+          <CustomSelect
+            value={zoneFilter}
+            onChange={setZoneFilter}
+            options={ZONE_SELECT_OPTIONS}
+            placeholder="Choisir une zone"
+          />
+        </div>
 
-        <select
-          className="rounded-lg border border-gray-300 bg-white p-3 font-medium text-gray-900"
-          value={zoneFilter}
-          onChange={(e) => setZoneFilter(e.target.value)}
-        >
-         <option value="">Choisir une zone / ville</option>
-         <option value="ALL_ZONES">Toutes les zones / villes</option>
-         {ZONE_OPTIONS.map((zone) => (
-  <option key={zone} value={zone}>
-    {zone}
-  </option>
-))}
-        </select>
+        {/* Type filter chips */}
+        <div className="mt-3 flex gap-2">
+          {TYPE_CHIPS.map(({ value, label }) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setTypeFilter(value)}
+              className={`rounded-full border px-4 py-1.5 text-sm font-[400] transition-colors ${
+                typeFilter === value
+                  ? 'border-brand bg-brand text-white'
+                  : 'border-border bg-white text-[#888888]'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <p className="mt-4 text-gray-700">{filtered.length} résultat(s)</p>
+      {/* Results */}
+      <div className="pt-4">
+        <p className="mb-3 px-4 text-sm font-[300] text-[#888888]">
+          {filtered.length} résultat(s)
+        </p>
 
-{(serviceFilter || zoneFilter) && filtered.length === 0 && (
-  <div className="mt-4 rounded-xl bg-white p-5 shadow">
-    <h2 className="text-lg font-bold text-gray-900">
-      Aucun professionnel trouvé pour le moment
-    </h2>
+        {errorMessage && (
+          <p className="mx-4 mb-3 rounded bg-red-100 p-3 text-red-700">{errorMessage}</p>
+        )}
 
-    <p className="mt-2 text-gray-700">
-      Nous n’avons pas encore de professionnel disponible
-      {serviceFilter ? ` pour ${serviceFilter}` : ''}
-      {zoneFilter ? ` dans la zone : ${zoneFilter}` : ''}.
-    </p>
+        {(serviceFilter || zoneFilter || typeFilter !== 'all') && filtered.length === 0 && (
+          <div className="mx-[10px] rounded-2xl border border-border bg-white p-5">
+            <h2 className="font-[500] text-ink">
+              Aucun professionnel trouvé pour le moment
+            </h2>
+            <p className="mt-2 text-sm font-[300] text-[#555555]">
+              Nous n'avons pas encore de professionnel disponible
+              {serviceFilter && serviceFilter !== 'ALL_SERVICES'
+                ? ` pour ${serviceFilter}`
+                : ''}
+              {zoneFilter && zoneFilter !== 'ALL_ZONES'
+                ? ` dans la zone : ${zoneFilter}`
+                : ''}
+              .
+            </p>
+            <p className="mt-3 text-sm font-[300] text-[#888888]">
+              Biso continue d'ajouter de nouveaux professionnels de confiance.
+              Revenez bientôt ou recommandez-nous un artisan ou une entreprise dans cette zone.
+            </p>
+          </div>
+        )}
 
-    <p className="mt-3 text-sm text-gray-600">
-      Biso continue d’ajouter de nouveaux professionnels de confiance.
-      Revenez bientôt ou recommandez-nous un artisan ou une entreprise dans cette zone.
-    </p>
-  </div>
-)}
+        <div className="flex flex-col">
+          {filtered.map((a) => {
+            const services =
+              a.profile_services
+                ?.map((ps: any) => ps.services?.name_fr)
+                .filter(Boolean) || [];
 
-      <div className="mt-4 grid gap-4">
-        {filtered.map((a) => {
-          const services =
-            a.profile_services
-              ?.map((ps: any) => ps.services?.name_fr)
-              .filter(Boolean) || [];
+            const approvedReviews =
+              a.reviews?.filter((r: any) => r.status === 'approved') || [];
 
-          const approvedReviews =
-            a.reviews?.filter((r: any) => r.status === 'approved') || [];
+            const averageRating =
+              approvedReviews.length > 0
+                ? (
+                    approvedReviews.reduce(
+                      (sum: number, review: any) => sum + review.rating,
+                      0
+                    ) / approvedReviews.length
+                  ).toFixed(1)
+                : null;
 
-          const averageRating =
-            approvedReviews.length > 0
-              ? (
-                  approvedReviews.reduce(
-                    (sum: number, review: any) => sum + review.rating,
-                    0
-                  ) / approvedReviews.length
-                ).toFixed(1)
-              : null;
+            const whatsappNumber = cleanWhatsappNumber(a.whatsapp);
 
-          const whatsappNumber = cleanWhatsappNumber(a.whatsapp);
+            return (
+              <div
+                key={a.id}
+                className="mx-[10px] mb-[10px] rounded-2xl border border-border bg-white p-[14px]"
+              >
+                {/* Top row: name + badge + rating */}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="font-[500] text-ink">
+                      {a.profile_type === 'company' ? a.company_name : a.contact_name}
+                    </h2>
+                    <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-[400] text-[#888888]">
+                      {a.profile_type === 'company' ? 'Entreprise' : 'Artisan'}
+                    </span>
+                  </div>
+                  <div className="shrink-0">
+                    <StarRating
+                      rating={averageRating ? Number(averageRating) : null}
+                      count={approvedReviews.length}
+                    />
+                  </div>
+                </div>
 
-          return (
-            <div key={a.id} className="rounded-xl bg-white p-5 shadow">
-              <div>
-  <div className="flex items-start justify-between gap-3">
-    <h2 className="text-xl font-bold text-gray-900">
-      {a.profile_type === 'company' ? a.company_name : a.contact_name}
-    </h2>
-
-    <span className="shrink-0 rounded bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">
-      {a.profile_type === 'company' ? 'Entreprise' : 'Artisan'}
-    </span>
-  </div>
-
-  <p className="mt-1 text-sm font-semibold text-gray-700">
-    {a.profile_type === 'company'
-      ? `Contact: ${a.contact_name}`
-      : a.company_name || 'Artisan indépendant'}
-  </p>
-
-  <p className="mt-2 text-sm font-semibold text-blue-700">
-    {services.length > 0 ? services.join(', ') : 'Service non renseigné'}
-  </p>
-
-  {a.is_verified && (
-    <span className="mt-2 inline-block rounded bg-blue-100 px-2 py-1 text-xs text-blue-700">
-      Vérifié
-    </span>
-  )}
-</div>
-
-              <div className="mt-2 space-y-1 text-sm text-gray-700">
-  <p>
-    📍 Zone couverte : {a.main_location || 'Zone non renseignée'}
-  </p>
-  <p>
-    Expérience : {a.experience_years || 'Expérience non renseignée'}
-  </p>
-</div>
-
-              
-              <StarRating
-                rating={averageRating ? Number(averageRating) : null}
-                count={approvedReviews.length}
-              />
-
-              <p className="mt-3 text-gray-800">
-                {a.description || 'Description non renseignée'}
-              </p>
-
-              <div className="mt-4 flex gap-3">
-                <Link
-                  href={`/profiles/${a.id}`}
-                  className="rounded-lg bg-gray-900 px-4 py-2 font-semibold text-white"
+                {/* Service */}
+                <p
+                  className={`mt-1 text-sm font-[500] ${
+                    a.profile_type === 'company' ? 'text-accent' : 'text-brand'
+                  }`}
                 >
-                  Voir profil
-                </Link>
+                  {services.length > 0 ? services.join(', ') : 'Service non renseigné'}
+                </p>
 
-                {whatsappNumber && (
-                  <a
-                    href={`https://wa.me/${whatsappNumber}?text=Bonjour, je vous ai trouvé via la plateforme et je souhaite discuter de vos services.`}
-                    target="_blank"
-                    className="rounded-lg bg-green-600 px-4 py-2 font-semibold text-white"
+                {/* Zone */}
+                <div className="mt-1 flex items-center gap-1 text-sm text-[#888888]">
+                  <MapPin size={13} className="shrink-0" />
+                  <span>{a.main_location || 'Zone non renseignée'}</span>
+                </div>
+
+                <hr className="my-3 border-border" />
+
+                {/* Description */}
+                <p className="text-sm font-[300] text-[#555555]">
+                  {a.description || 'Description non renseignée'}
+                </p>
+
+                {/* Action buttons */}
+                <div className="mt-4 flex gap-2">
+                  <Link
+                    href={`/profiles/${a.id}`}
+                    className="rounded-lg bg-brand px-4 py-2 text-sm font-[400] text-white"
                   >
-                    WhatsApp
-                  </a>
-                )}
+                    Voir profil
+                  </Link>
+
+                  {whatsappNumber && (
+                    <a
+                      href={`https://wa.me/${whatsappNumber}?text=Bonjour, je vous ai trouvé via la plateforme et je souhaite discuter de vos services.`}
+                      target="_blank"
+                      className="rounded-lg bg-green-600 px-4 py-2 text-sm font-[400] text-white"
+                    >
+                      WhatsApp
+                    </a>
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </main>
   );

@@ -1,64 +1,76 @@
 import Link from 'next/link';
+import { MessageCircle, Search, Star, Image } from 'lucide-react';
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-gray-100 text-gray-900">
-      <section className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center px-5 py-10">
-        <div className="rounded-2xl bg-white p-6 shadow">
-          
-<h1 className="text-4xl text-center font-bold leading-tight text-gray-900">
-  Biso
-</h1>
+    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-5 py-12">
 
-<p className="mt-4 text-center text-lg text-gray-700">
-  Une communauté de professionnels de confiance, recommandés pour leur sérieux, leur savoir-faire et la qualité de leurs réalisations.
-</p>
-
-          <div className="mt-6 grid gap-3">
-            <Link
-              href="/search"
-              className="block rounded-xl bg-gray-900 px-5 py-4 text-center text-lg font-bold text-white"
-            >
-              Je cherche un pro
-            </Link>
-
-            <a
-              href="https://forms.gle/Km1Cq9u8BAJPYHys7"
-              target="_blank"
-              className="block rounded-xl border border-gray-300 bg-white px-5 py-4 text-center text-lg font-bold text-gray-900"
-            >
-              Je suis artisan / entreprise
-            </a>
-          </div>
-
-          <div className="mt-6 grid gap-3 border-t pt-5 text-sm text-gray-700">
-            <div>
-              <p className="font-bold text-gray-900">🔎 Recherche simple</p>
-              <p>Filtrez par service et zone de travail.</p>
-            </div>
-
-            <div>
-              <p className="font-bold text-gray-900">⭐ Avis clients</p>
-              <p>Consultez les notes et retours des clients.</p>
-            </div>
-
-            <div>
-              <p className="font-bold text-gray-900">📸 Réalisations</p>
-              <p>Voyez les photos des travaux déjà réalisés.</p>
-            </div>
-
-            <div>
-              <p className="font-bold text-gray-900">📲 Contact WhatsApp</p>
-              <p>Contactez directement l’artisan ou l’entreprise.</p>
-            </div>
-          </div>
-
-        </div>
-
-        <p className="mt-3 text-center text-sm text-gray-500">
-          Biso signifie «nous» — parce que la confiance se construit ensemble.
+      {/* Logo */}
+      <div className="text-center">
+        <h1 className="text-5xl font-[500] text-brand">Biso</h1>
+        <p className="mt-3 text-lg font-[300] text-[#555555]">
+          Les meilleurs artisans, recommandés par leurs clients.
         </p>
-      </section>
+      </div>
+
+      {/* CTA buttons */}
+      <div className="flex flex-col gap-3">
+        <Link
+          href="/search"
+          className="w-full rounded-xl bg-brand py-4 text-center font-[400] text-white"
+        >
+          Je cherche un pro
+        </Link>
+
+        <Link
+          href="/artisan"
+          className="w-full rounded-xl border-2 border-brand bg-white py-4 text-center font-[400] text-brand"
+        >
+          Je suis artisan / entreprise
+        </Link>
+      </div>
+
+      {/* Features list */}
+      <div className="flex flex-col gap-4">
+        {[
+          {
+            icon: Search,
+            title: 'Recherche simple',
+            description: 'Filtrez par service et zone de travail.',
+          },
+          {
+            icon: Star,
+            title: 'Avis clients',
+            description: 'Consultez les notes et retours des clients.',
+          },
+          {
+            icon: Image,
+            title: 'Réalisations',
+            description: 'Voyez les photos des travaux déjà réalisés.',
+          },
+          {
+            icon: MessageCircle,
+            title: 'Contact WhatsApp',
+            description: "Contactez directement l'artisan ou l'entreprise.",
+          },
+        ].map(({ icon: Icon, title, description }) => (
+          <div key={title} className="flex items-start gap-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-light">
+              <Icon size={18} className="text-brand" />
+            </div>
+            <div>
+              <p className="font-[500] text-ink">{title}</p>
+              <p className="text-sm font-[300] text-[#666666]">{description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Manifesto */}
+      <p className="text-center text-sm font-[300] text-muted">
+        Biso signifie <em>« nous »</em> — parce que la confiance se construit ensemble.
+      </p>
+
     </main>
   );
 }
