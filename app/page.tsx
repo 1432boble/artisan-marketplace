@@ -6,7 +6,7 @@ export default function LandingPage() {
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-5 py-12">
 
       {/* Logo */}
-      <div className="text-center">
+      <div className="pt-12 text-center">
         <h1 className="text-5xl font-[500] text-brand">Biso</h1>
         <p className="mt-3 text-lg font-[300] text-[#555555]">
           Les meilleurs artisans, recommandés par leurs clients.
@@ -67,7 +67,7 @@ export default function LandingPage() {
       </div>
 
       {/* Manifesto */}
-      <p className="text-center text-sm font-[300] text-muted">
+      <p className="pb-12 text-center text-sm font-[300] text-muted">
         Biso signifie <em>« nous »</em> — parce que la confiance se construit ensemble.
       </p>
 
