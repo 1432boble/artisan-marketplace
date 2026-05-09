@@ -9,7 +9,7 @@ export default function LandingPage() {
       <div className="pt-12 text-center">
         <h1 className="text-5xl font-[500] text-brand">Biso</h1>
         <p className="mt-3 text-lg font-[300] text-[#555555]">
-          Les meilleurs artisans, recommandés par leurs clients.
+          Une communauté de professionnels de confiance, recommandés pour leur sérieux et la qualité de leurs réalisations.
         </p>
       </div>
 
