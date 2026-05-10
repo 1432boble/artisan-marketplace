@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { QRCodeCanvas } from 'qrcode.react';
@@ -67,6 +67,7 @@ export default function ProfilePage() {
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
   const [reviewPhotoFiles, setReviewPhotoFiles] = useState<File[]>([]);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -434,7 +435,7 @@ export default function ProfilePage() {
 
         <input
           placeholder="Votre nom"
-          className="mb-3 w-full rounded-xl border-[1.5px] border-brand bg-white p-3 font-[300] text-brand placeholder:opacity-70"
+          className="mb-3 w-full rounded-xl border-[1.5px] border-brand bg-white p-3 font-[300] text-brand placeholder:text-gray-500"
           value={clientName}
           onChange={(e) => setClientName(e.target.value)}
         />
@@ -467,34 +468,33 @@ export default function ProfilePage() {
 
         <textarea
           placeholder="Votre commentaire"
-          className="mb-3 w-full rounded-xl border-[1.5px] border-brand bg-white p-3 font-[300] text-brand placeholder:opacity-70"
+          className="mb-3 w-full rounded-xl border-[1.5px] border-brand bg-white p-3 font-[300] text-brand placeholder:text-gray-500"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
 
-        <label className="mb-4 flex gap-2 text-sm font-[300] text-[#888888]">
-          <input
-            type="checkbox"
-            checked={workedWithProfessional}
-            onChange={(e) => setWorkedWithProfessional(e.target.checked)}
-          />
-          Je confirme avoir réellement travaillé avec ce professionnel.
-        </label>
-
         <div className="mb-4">
-          <p className="mb-2 text-sm font-[300] text-[#888888]">
-            Photos (optionnel, max 3)
-          </p>
           <input
+            ref={fileInputRef}
             type="file"
             accept="image/*"
             multiple
-            className="w-full text-sm text-[#888888]"
+            className="hidden"
             onChange={(e) => {
               const files = Array.from(e.target.files || []);
               setReviewPhotoFiles((prev) => [...prev, ...files].slice(0, 3));
+              e.target.value = '';
             }}
           />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full rounded-xl border-[1.5px] border-brand bg-white py-3 text-center font-[400] text-brand"
+          >
+            {reviewPhotoFiles.length === 0
+              ? '📷 Ajouter des photos (max 3)'
+              : `📷 ${reviewPhotoFiles.length} photo${reviewPhotoFiles.length > 1 ? 's' : ''} sélectionnée${reviewPhotoFiles.length > 1 ? 's' : ''}`}
+          </button>
           {reviewPhotoFiles.length > 0 && (
             <div className="mt-2 flex gap-2">
               {reviewPhotoFiles.map((f, idx) => (
@@ -518,6 +518,15 @@ export default function ProfilePage() {
             </div>
           )}
         </div>
+
+        <label className="mb-4 flex gap-2 text-sm font-[300] text-[#888888]">
+          <input
+            type="checkbox"
+            checked={workedWithProfessional}
+            onChange={(e) => setWorkedWithProfessional(e.target.checked)}
+          />
+          Je confirme avoir réellement travaillé avec ce professionnel.
+        </label>
 
         <button
           onClick={submitReview}
