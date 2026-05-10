@@ -64,6 +64,9 @@ export default function ProfilePage() {
   const [workedWithProfessional, setWorkedWithProfessional] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [activePhotoIdx, setActivePhotoIdx] = useState(0);
+  const [reviewPhotoFiles, setReviewPhotoFiles] = useState<File[]>([]);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -96,7 +99,10 @@ export default function ProfilePage() {
         .select('*')
         .eq('profile_id', id);
 
-      setPhotos(photoData || []);
+      const loadedPhotos = photoData || [];
+      setPhotos(loadedPhotos);
+      const fi = loadedPhotos.findIndex((p: any) => p.is_featured);
+      setActivePhotoIdx(fi >= 0 ? fi : 0);
     };
 
     fetchData();
@@ -148,6 +154,21 @@ export default function ProfilePage() {
 
     setSubmitting(true);
 
+    const photoUrls: string[] = [];
+    for (const file of reviewPhotoFiles) {
+      const ext = file.name.split('.').pop() || 'jpg';
+      const path = `${id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { data: uploadData, error: uploadErr } = await supabase.storage
+        .from('review-photos')
+        .upload(path, file, { contentType: file.type });
+      if (!uploadErr && uploadData) {
+        const { data: { publicUrl } } = supabase.storage
+          .from('review-photos')
+          .getPublicUrl(uploadData.path);
+        photoUrls.push(publicUrl);
+      }
+    }
+
     const { error } = await supabase.from('reviews').insert({
       profile_id: id,
       client_name: clientName,
@@ -161,6 +182,7 @@ export default function ProfilePage() {
       worked_with_professional: workedWithProfessional,
       contact_verified: false,
       status: 'pending',
+      photos: photoUrls.length > 0 ? photoUrls : null,
     });
 
     setSubmitting(false);
@@ -180,6 +202,7 @@ export default function ProfilePage() {
     setProfessionalismRating(5);
     setComment('');
     setWorkedWithProfessional(false);
+    setReviewPhotoFiles([]);
   };
 
   function copyLink() {
@@ -301,15 +324,34 @@ export default function ProfilePage() {
       {photos.length > 0 && (
         <div className="mt-2 bg-white px-4 py-5">
           <SectionTitle>Réalisations</SectionTitle>
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            {photos.map((p) => (
-              <img
-                key={p.id}
-                src={p.photo_url?.trim()}
-                alt="Réalisation"
-                className="aspect-square w-full rounded-xl object-cover"
-              />
-            ))}
+          <div className="mt-4">
+            <img
+              src={photos[activePhotoIdx]?.photo_url?.trim()}
+              alt="Réalisation"
+              className="aspect-video w-full rounded-xl object-cover"
+            />
+            {photos.length > 1 && (
+              <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+                {photos
+                  .map((p, idx) => ({ p, idx }))
+                  .filter(({ idx }) => idx !== activePhotoIdx)
+                  .slice(0, 5)
+                  .map(({ p, idx }) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setActivePhotoIdx(idx)}
+                      className="shrink-0 overflow-hidden rounded-lg"
+                    >
+                      <img
+                        src={p.photo_url?.trim()}
+                        alt="Réalisation"
+                        className="h-16 w-16 object-cover"
+                      />
+                    </button>
+                  ))}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -363,6 +405,20 @@ export default function ProfilePage() {
                   )}
                 </div>
                 <p className="mt-2 text-sm font-[300] text-[#555555]">{r.comment}</p>
+                {Array.isArray(r.photos) && r.photos.length > 0 && (
+                  <div className="mt-2 flex gap-2">
+                    {r.photos.map((url: string) => (
+                      <button
+                        key={url}
+                        type="button"
+                        onClick={() => setLightboxUrl(url)}
+                        className="overflow-hidden rounded-lg"
+                      >
+                        <img src={url} alt="Photo avis" className="h-14 w-14 object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -378,7 +434,7 @@ export default function ProfilePage() {
 
         <input
           placeholder="Votre nom"
-          className="mb-3 w-full rounded-xl border-[1.5px] border-brand bg-white p-3 font-[300] text-brand placeholder:opacity-50"
+          className="mb-3 w-full rounded-xl border-[1.5px] border-brand bg-white p-3 font-[300] text-brand placeholder:opacity-70"
           value={clientName}
           onChange={(e) => setClientName(e.target.value)}
         />
@@ -411,7 +467,7 @@ export default function ProfilePage() {
 
         <textarea
           placeholder="Votre commentaire"
-          className="mb-3 w-full rounded-xl border-[1.5px] border-brand bg-white p-3 font-[300] text-brand placeholder:opacity-50"
+          className="mb-3 w-full rounded-xl border-[1.5px] border-brand bg-white p-3 font-[300] text-brand placeholder:opacity-70"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
@@ -425,6 +481,44 @@ export default function ProfilePage() {
           Je confirme avoir réellement travaillé avec ce professionnel.
         </label>
 
+        <div className="mb-4">
+          <p className="mb-2 text-sm font-[300] text-[#888888]">
+            Photos (optionnel, max 3)
+          </p>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            className="w-full text-sm text-[#888888]"
+            onChange={(e) => {
+              const files = Array.from(e.target.files || []);
+              setReviewPhotoFiles((prev) => [...prev, ...files].slice(0, 3));
+            }}
+          />
+          {reviewPhotoFiles.length > 0 && (
+            <div className="mt-2 flex gap-2">
+              {reviewPhotoFiles.map((f, idx) => (
+                <div key={idx} className="relative">
+                  <img
+                    src={URL.createObjectURL(f)}
+                    alt="Aperçu"
+                    className="h-14 w-14 rounded-lg object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setReviewPhotoFiles((prev) => prev.filter((_, i) => i !== idx))
+                    }
+                    className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold leading-none text-white"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         <button
           onClick={submitReview}
           disabled={submitting}
@@ -434,6 +528,18 @@ export default function ProfilePage() {
         </button>
       </div>
 
+      {lightboxUrl && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setLightboxUrl(null)}
+        >
+          <img
+            src={lightboxUrl}
+            alt="Photo"
+            className="max-h-[90vh] max-w-full rounded-xl object-contain"
+          />
+        </div>
+      )}
     </main>
   );
 }

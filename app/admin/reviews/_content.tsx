@@ -95,6 +95,20 @@ export default function AdminReviewsContent() {
                 {r.comment || 'Aucun commentaire'}
               </p>
 
+              {Array.isArray(r.photos) && r.photos.length > 0 && (
+                <div className="mt-3 flex gap-2">
+                  {r.photos.map((url: string) => (
+                    <a key={url} href={url} target="_blank" rel="noreferrer">
+                      <img
+                        src={url}
+                        alt="Photo avis"
+                        className="h-16 w-16 rounded-lg object-cover"
+                      />
+                    </a>
+                  ))}
+                </div>
+              )}
+
               <p className="mt-2 text-sm text-gray-600">
                 Confirmation client:{' '}
                 {r.worked_with_professional ? 'Oui' : 'Non'}
