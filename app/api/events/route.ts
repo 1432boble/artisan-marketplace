@@ -27,11 +27,7 @@ export async function POST(request: Request) {
       metadata: metadata ?? null,
     });
 
-    if (error) {
-      console.error('[events] Supabase insert error:', error.message, error.code);
-    } else {
-      console.log('[events] inserted ok');
-    }
+    console.log('[events] insert error:', error);
 
     return NextResponse.json({ ok: true });
   } catch (err) {
