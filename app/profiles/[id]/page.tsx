@@ -340,7 +340,7 @@ export default function ProfilePage() {
             <img
               src={photos[activePhotoIdx]?.photo_url?.trim()}
               alt="Réalisation"
-              className="aspect-video w-full rounded-xl object-cover"
+              className="aspect-video w-full rounded-xl bg-[#F7F7F7] object-contain"
             />
             {photos.length > 1 && (
               <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
@@ -358,7 +358,7 @@ export default function ProfilePage() {
                       <img
                         src={p.photo_url?.trim()}
                         alt="Réalisation"
-                        className="h-16 w-16 object-cover"
+                        className="h-16 w-16 object-cover object-top"
                       />
                     </button>
                   ))}
