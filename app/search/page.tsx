@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import StarRating from '@/components/StarRating';
 import { cleanWhatsappNumber } from '@/lib/whatsapp';
 import { ArrowLeft, ChevronDown, MapPin } from 'lucide-react';
+import { track } from '@/lib/track';
 
 const SERVICE_OPTIONS = [
   'Peinture',
@@ -105,6 +106,10 @@ export default function SearchPage() {
   const [zoneFilter, setZoneFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
   const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    track('search_view');
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {

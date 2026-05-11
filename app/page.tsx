@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { MessageCircle, Search, Star, Image } from 'lucide-react';
+import { TrackPageView } from '@/components/TrackPageView';
 
 export default function LandingPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-5 py-12">
+      <TrackPageView event="landing_view" />
 
       {/* Logo */}
       <div className="pt-12 text-center">

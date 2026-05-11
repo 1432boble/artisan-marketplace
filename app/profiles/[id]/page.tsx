@@ -7,6 +7,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 import StarRating from '@/components/StarRating';
 import { cleanWhatsappNumber } from '@/lib/whatsapp';
 import { ArrowLeft, Briefcase, MapPin, User } from 'lucide-react';
+import { track } from '@/lib/track';
 
 function cleanCallNumber(phone: string) {
   if (!phone) return '';
@@ -109,6 +110,10 @@ export default function ProfilePage() {
     fetchData();
   }, [id]);
 
+  useEffect(() => {
+    if (id) track('profile_view', id as string);
+  }, [id]);
+
   if (!profile) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-bg">
@@ -196,6 +201,7 @@ export default function ProfilePage() {
     }
 
     alert('Merci. Votre avis sera publié après vérification.');
+    track('review_submit', id as string);
 
     setClientName('');
     setQualityRating(5);
@@ -212,6 +218,7 @@ export default function ProfilePage() {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    track('share_click', id as string);
   }
 
   return (
@@ -307,6 +314,7 @@ export default function ProfilePage() {
             <a
               href={`https://wa.me/${whatsappNumber}?text=Bonjour, je vous ai trouvé via Biso et je souhaite discuter de vos services.`}
               target="_blank"
+              onClick={() => track('whatsapp_click', id as string)}
               className="block w-full rounded-xl bg-[#25D366] py-4 text-center font-[400] text-white"
             >
               WhatsApp
@@ -315,6 +323,7 @@ export default function ProfilePage() {
           {callNumber && (
             <a
               href={`tel:${callNumber}`}
+              onClick={() => track('call_click', id as string)}
               className="block w-full rounded-xl border-[1.5px] border-brand bg-white py-4 text-center font-[400] text-brand"
             >
               Appeler
@@ -367,6 +376,7 @@ export default function ProfilePage() {
           <a
             href={`https://wa.me/?text=${encodeURIComponent(window.location.href)}`}
             target="_blank"
+            onClick={() => track('share_click', id as string)}
             className="w-full rounded-xl bg-[#25D366] py-3 text-center font-[400] text-white"
           >
             Partager sur WhatsApp
