@@ -18,6 +18,7 @@ export async function POST(request: Request) {
       console.error('[events] Missing env vars — url:', !!url, 'key:', !!key);
       return NextResponse.json({ ok: true });
     }
+    console.log('[events] key prefix:', key.slice(0, 16));
 
     const supabase = createClient(url, key);
 
