@@ -191,7 +191,12 @@ export default function SearchPage() {
 
     if (zoneFilter && zoneFilter !== 'ALL_ZONES') {
       result = result.filter((a) => {
-        const zones: string[] = a.work_zones || [];
+        const raw = a.work_zones;
+        const zones: string[] = Array.isArray(raw)
+          ? raw
+          : typeof raw === 'string' && raw.length > 0
+          ? raw.split(',').map((z: string) => z.trim())
+          : [];
         if (zoneFilter === 'Tout Abidjan') {
           return zones.some((z) => z.toLowerCase().includes('abidjan'));
         }
