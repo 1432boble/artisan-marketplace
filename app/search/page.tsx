@@ -32,8 +32,41 @@ const SERVICE_SELECT_OPTIONS = [
 ];
 
 const ZONE_SELECT_OPTIONS = [
-  { label: 'Tout Abidjan', value: 'Abidjan' },
   { label: "Toute la Côte d'Ivoire", value: 'ALL_ZONES' },
+  { label: 'Tout Abidjan', value: 'Tout Abidjan' },
+  { label: 'Abidjan - Abobo', value: 'Abidjan - Abobo' },
+  { label: 'Abidjan - Adjamé', value: 'Abidjan - Adjamé' },
+  { label: 'Abidjan - Anyama', value: 'Abidjan - Anyama' },
+  { label: 'Abidjan - Attecoubé', value: 'Abidjan - Attecoubé' },
+  { label: 'Abidjan - Bingerville', value: 'Abidjan - Bingerville' },
+  { label: 'Abidjan - Cocody', value: 'Abidjan - Cocody' },
+  { label: 'Abidjan - Koumassi', value: 'Abidjan - Koumassi' },
+  { label: 'Abidjan - Marcory', value: 'Abidjan - Marcory' },
+  { label: 'Abidjan - Plateau', value: 'Abidjan - Plateau' },
+  { label: 'Abidjan - Port-Bouet', value: 'Abidjan - Port-Bouet' },
+  { label: 'Abidjan - Treichville', value: 'Abidjan - Treichville' },
+  { label: 'Abidjan - Yopougon', value: 'Abidjan - Yopougon' },
+  { label: 'Abengourou', value: 'Abengourou' },
+  { label: 'Aboisso', value: 'Aboisso' },
+  { label: 'Agboville', value: 'Agboville' },
+  { label: 'Bondoukou', value: 'Bondoukou' },
+  { label: 'Bouaflé', value: 'Bouaflé' },
+  { label: 'Bouaké', value: 'Bouaké' },
+  { label: 'Daoukro', value: 'Daoukro' },
+  { label: 'Daloa', value: 'Daloa' },
+  { label: 'Divo', value: 'Divo' },
+  { label: 'Ferkessédougou', value: 'Ferkessédougou' },
+  { label: 'Gagnoa', value: 'Gagnoa' },
+  { label: 'Grand-Bassam', value: 'Grand-Bassam' },
+  { label: 'Issia', value: 'Issia' },
+  { label: 'Korhogo', value: 'Korhogo' },
+  { label: 'Man', value: 'Man' },
+  { label: 'Odienné', value: 'Odienné' },
+  { label: 'San-Pédro', value: 'San-Pédro' },
+  { label: 'Séguéla', value: 'Séguéla' },
+  { label: 'Soubré', value: 'Soubré' },
+  { label: 'Tiassalé', value: 'Tiassalé' },
+  { label: 'Yamoussoukro', value: 'Yamoussoukro' },
 ];
 
 function CustomSelect({
@@ -75,7 +108,7 @@ function CustomSelect({
       </button>
 
       {open && (
-        <div className="absolute left-0 right-0 top-full z-20 mt-1 overflow-hidden rounded-xl border border-border bg-white shadow-lg">
+        <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-[60vh] overflow-y-auto rounded-xl border border-border bg-white shadow-lg">
           {options.map((opt) => (
             <button
               key={opt.value}
@@ -157,9 +190,13 @@ export default function SearchPage() {
     }
 
     if (zoneFilter && zoneFilter !== 'ALL_ZONES') {
-      result = result.filter((a) =>
-        a.main_location?.toLowerCase().includes(zoneFilter.toLowerCase())
-      );
+      result = result.filter((a) => {
+        const zones: string[] = a.work_zones || [];
+        if (zoneFilter === 'Tout Abidjan') {
+          return zones.some((z) => z.toLowerCase().includes('abidjan'));
+        }
+        return zones.some((z) => z.toLowerCase() === zoneFilter.toLowerCase());
+      });
     }
 
     if (typeFilter !== 'all') {
