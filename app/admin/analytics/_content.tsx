@@ -59,13 +59,20 @@ export default function AnalyticsContent() {
   const [profiles, setProfiles] = useState<ProfileRow[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
   useEffect(() => {
     fetch('/api/admin/events')
       .then((r) => r.json())
       .then((data) => {
-        setEvents(data.events ?? []);
-        setProfiles(data.profiles ?? []);
+        if (data.error) {
+          setFetchError(data.error);
+        } else {
+          setEvents(data.events ?? []);
+          setProfiles(data.profiles ?? []);
+        }
       })
+      .catch((err) => setFetchError(String(err)))
       .finally(() => setLoading(false));
   }, []);
 
@@ -96,9 +103,10 @@ export default function AnalyticsContent() {
     daily[key] = {};
     for (const t of EVENT_TYPES) daily[key][t] = 0;
   }
+  const eventTypeSet = new Set<string>(EVENT_TYPES);
   for (const e of filtered) {
     const day = e.created_at.slice(0, 10);
-    if (daily[day] && EVENT_TYPES.includes(e.event_type as (typeof EVENT_TYPES)[number])) {
+    if (daily[day] && eventTypeSet.has(e.event_type)) {
       daily[day][e.event_type]++;
     }
   }
@@ -115,12 +123,15 @@ export default function AnalyticsContent() {
       pointRadius: days <= 7 ? 4 : 2,
       pointHoverRadius: 6,
       borderWidth: 2,
+      // Distinct dash patterns so overlapping zero-lines are still identifiable
+      borderDash: t === 'search_view' ? [6, 3] : t === 'profile_view' ? [2, 2] : t === 'whatsapp_click' ? [8, 4] : [],
     })),
   };
 
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: true,
+    clip: false as const,
     interaction: { mode: 'index' as const, intersect: false },
     plugins: {
       legend: {
@@ -130,6 +141,7 @@ export default function AnalyticsContent() {
           boxHeight: 10,
           padding: 16,
           font: { size: 12 },
+          usePointStyle: true,
         },
       },
       tooltip: { padding: 10 },
@@ -141,6 +153,7 @@ export default function AnalyticsContent() {
       },
       y: {
         beginAtZero: true,
+        suggestedMax: 5,
         grid: { color: 'rgba(0,0,0,0.05)' },
         ticks: { precision: 0, font: { size: 11 } },
       },
@@ -211,7 +224,13 @@ export default function AnalyticsContent() {
           </div>
         )}
 
-        {!loading && (
+        {!loading && fetchError && (
+          <div className="rounded-xl border p-4 text-sm" style={{ background: '#FEF2F2', borderColor: '#FCA5A5', color: '#991B1B' }}>
+            Erreur API : {fetchError}
+          </div>
+        )}
+
+        {!loading && !fetchError && (
           <>
             {/* Metric cards */}
             <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4">

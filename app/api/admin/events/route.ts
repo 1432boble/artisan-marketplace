@@ -1,12 +1,17 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function GET() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !key) {
+    console.error('[api/admin/events] Missing env vars: NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+    return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 });
+  }
+
+  const supabase = createClient(url, key);
+
   const [eventsResult, profilesResult] = await Promise.all([
     supabase
       .from('events')
@@ -19,7 +24,12 @@ export async function GET() {
   ]);
 
   if (eventsResult.error) {
+    console.error('[api/admin/events] events query error:', eventsResult.error);
     return NextResponse.json({ error: eventsResult.error.message }, { status: 500 });
+  }
+
+  if (profilesResult.error) {
+    console.error('[api/admin/events] profiles query error:', profilesResult.error);
   }
 
   return NextResponse.json({
