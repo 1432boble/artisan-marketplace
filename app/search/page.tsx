@@ -299,7 +299,8 @@ export default function SearchPage() {
         )}
 
         <div className="flex flex-col">
-          {filtered.map((a) => {
+          {(filtered || []).map((a) => {
+            try {
             const services =
               a.profile_services
                 ?.map((ps: any) => ps.services?.name_fr)
@@ -386,6 +387,9 @@ export default function SearchPage() {
                 </div>
               </div>
             );
+            } catch (e) {
+              return null;
+            }
           })}
         </div>
       </div>
