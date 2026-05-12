@@ -108,7 +108,7 @@ function CustomSelect({
       </button>
 
       {open && (
-        <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-[60vh] overflow-y-auto rounded-xl border border-border bg-white shadow-lg">
+        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-[60vh] overflow-y-auto rounded-xl border border-border bg-white shadow-lg">
           {options.map((opt) => (
             <button
               key={opt.value}
@@ -267,7 +267,7 @@ export default function SearchPage() {
       </div>
 
       {/* Results */}
-      <div className="pt-4">
+      <div className="pt-4 min-h-[40vh]">
         <p className="mb-3 px-4 text-sm font-[300] text-[#888888]">
           {filtered.length} résultat(s)
         </p>
