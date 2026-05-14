@@ -108,6 +108,27 @@ Includes a `photos` column (text[]) for client-uploaded review photos.
 
 ---
 
+## Services — Sync Checklist
+
+The `services` table in Supabase is the single source of truth.
+Every time a service is added, renamed, or deactivated, ALL of the
+following must be updated in the same session before closing:
+
+1. **Supabase** `services` table — add/edit/deactivate the service
+2. **Google Form** — add/remove the checkbox in "Service principal"
+3. **`/admin/profiles/new`** — add/remove the checkbox in the service list
+4. **`biso_project_instructions.md`** — update the services list below
+
+### Current services list (must match Supabase `name_fr`, alphabetical)
+Architecte, Architecte d'intérieur, Carrelage, Charpenterie, Coffrage,
+Démolition, Domotique, Électricité, Energie renouvelable, Étanchéité,
+Excavation, Ferraillage, Froid & Climatisation, Graphisme, Jardinage,
+Maçonnerie, Mécanique, Menuiserie aluminium, Menuiserie bois,
+Menuiserie métallique, Nettoyage, Paysagisme, Peinture, Photographie,
+Plâtrerie, Plomberie, Sécurité électronique, Tailleur
+
+---
+
 ## Services List (29 services — must match `services` table `name_fr` exactly)
 
 ```
