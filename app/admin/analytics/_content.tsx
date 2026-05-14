@@ -22,7 +22,7 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
 
-type DayRange = 7 | 14 | 30;
+type DayRange = 1 | 7 | 14 | 30;
 
 interface EventRow {
   id: string;
@@ -77,8 +77,12 @@ export default function AnalyticsContent() {
   }, []);
 
   const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - days);
-  cutoff.setHours(0, 0, 0, 0);
+  if (days === 1) {
+    cutoff.setHours(0, 0, 0, 0);
+  } else {
+    cutoff.setDate(cutoff.getDate() - days);
+    cutoff.setHours(0, 0, 0, 0);
+  }
 
   const filtered = events.filter((e) => new Date(e.created_at) >= cutoff);
 
@@ -203,7 +207,7 @@ export default function AnalyticsContent() {
           className="mb-6 inline-flex overflow-hidden rounded-xl border"
           style={{ borderColor: 'var(--border)' }}
         >
-          {([7, 14, 30] as DayRange[]).map((d) => (
+          {([1, 7, 14, 30] as DayRange[]).map((d) => (
             <button
               key={d}
               onClick={() => setDays(d)}
