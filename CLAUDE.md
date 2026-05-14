@@ -1,5 +1,5 @@
 # Biso — Claude Code Instructions
-*Last updated: May 14, 2026*
+*Last updated: May 14, 2026 (session 2)*
 
 ## This is NOT the Next.js you know
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
@@ -26,12 +26,21 @@ French-language artisan marketplace for Côte d'Ivoire. Connects clients with tr
 | `/admin/profiles/new` | Admin: create profile |
 | `/admin/upload` | Admin: upload portfolio photos |
 | `/admin/reviews` | Admin: approve/reject reviews |
+| `/admin/analytics` | Admin: event analytics dashboard (1j/7j/14j/30j filters, Chart.js) |
 | `app/not-found.tsx` | Custom 404 page |
 
 ### Components
 - `components/StarRating.tsx`
-- `components/TrackPageView.tsx`
+- `components/TrackPageView.tsx` — fires `track(event)` on mount, renders nothing
 - No gallery component — portfolio gallery is inline in `app/profiles/[id]/page.tsx`
+
+### Analytics
+- `app/admin/analytics/page.tsx` — server component, auth guard via `ADMIN_UPLOAD_KEY`
+- `app/admin/analytics/_content.tsx` — client component, fetches from `/api/admin/events`
+- Events tracked: `landing_view`, `search_view`, `profile_view`, `whatsapp_click`
+- Day range filter: **1j** (today from midnight), 7j, 14j, 30j
+- `lib/track.ts` — fire-and-forget POST to `/api/events` (errors silently swallowed)
+- `app/api/events/route.ts` — inserts into Supabase `events` table using service role key
 
 ---
 
@@ -101,6 +110,7 @@ export const supabase = createClient(
 - The search dropdown fetches live from Supabase with `is_active = true`. Adding a service = insert a row in Supabase. No code change needed.
 - Service names are case-sensitive. Always use exact `name_fr` values.
 - Search filter uses exact match: `.some(ps => ps.services?.name_fr === serviceFilter)` — never `.includes()`.
+- **Current count: 29 services.** Added Graphisme, Jardinage, Paysagisme, Photographie; replaced Panneaux solaires with Energie Renouvelable. Full list in `biso_project_instructions.md`.
 
 ### Admin auth
 - Admin routes protected by `ADMIN_UPLOAD_KEY` environment variable — server-side only.
