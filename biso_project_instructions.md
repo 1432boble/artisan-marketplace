@@ -108,29 +108,33 @@ Includes a `photos` column (text[]) for client-uploaded review photos.
 
 ---
 
-## Services List (24 services — must match `services` table `name_fr` exactly)
+## Services List (29 services — must match `services` table `name_fr` exactly)
 
 ```
 Architecte
-Architecte d'interieur
+Architecte d'intérieur
 Carrelage
 Charpenterie
 Coffrage
 Démolition
 Domotique
 Électricité
+Energie Renouvelable
 Étanchéité
 Excavation
 Ferraillage
 Froid & Climatisation
+Graphisme
+Jardinage
 Maçonnerie
 Mécanique
 Menuiserie aluminium
 Menuiserie bois
 Menuiserie métallique
 Nettoyage
-Panneaux solaires
+Paysagisme
 Peinture
+Photographie
 Plâtrerie
 Plomberie
 Sécurité électronique
