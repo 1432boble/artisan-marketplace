@@ -54,6 +54,8 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
   const [photos, setPhotos] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
   const [clientName, setClientName] = useState('');
   const [qualityRating, setQualityRating] = useState(5);
@@ -64,6 +66,7 @@ export default function ProfilePage() {
   const [comment, setComment] = useState('');
   const [workedWithProfessional, setWorkedWithProfessional] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
   const [copied, setCopied] = useState(false);
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
   const [reviewPhotoFiles, setReviewPhotoFiles] = useState<File[]>([]);
@@ -78,12 +81,18 @@ export default function ProfilePage() {
         .from('profiles')
         .select(`
           *,
-        profile_services (
-          services ( name_fr )
-        )
-   `)
-   .eq('id', id)
-   .single();
+          profile_services (
+            services ( name_fr )
+          )
+        `)
+        .eq('id', id)
+        .single();
+
+      if (!profileData) {
+        setNotFound(true);
+        setLoading(false);
+        return;
+      }
 
       setProfile(profileData);
 
@@ -105,6 +114,7 @@ export default function ProfilePage() {
       setPhotos(loadedPhotos);
       const fi = loadedPhotos.findIndex((p: any) => p.is_featured);
       setActivePhotoIdx(fi >= 0 ? fi : 0);
+      setLoading(false);
     };
 
     fetchData();
@@ -114,11 +124,28 @@ export default function ProfilePage() {
     if (id) track('profile_view', id as string);
   }, [id]);
 
-  if (!profile) {
+  if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-bg">
-        <p className="font-[300] text-[#888888]">Chargement...</p>
-      </div>
+      <main className="min-h-screen bg-gray-100 p-4 text-gray-900">
+        <p className="text-center text-gray-600">Chargement...</p>
+      </main>
+    );
+  }
+
+  if (notFound) {
+    return (
+      <main className="min-h-screen bg-gray-100 p-4 text-gray-900">
+        <div className="mt-20 flex flex-col items-center text-center">
+          <p className="text-xl font-semibold text-gray-900">Profil introuvable</p>
+          <p className="mt-2 text-gray-600">Ce profil n'existe pas ou a été supprimé.</p>
+          <a
+            href="/search"
+            className="mt-6 rounded-lg bg-gray-900 px-6 py-3 font-semibold text-white"
+          >
+            Retour aux artisans
+          </a>
+        </div>
+      </main>
     );
   }
 
@@ -144,11 +171,12 @@ export default function ProfilePage() {
 
   const submitReview = async () => {
     if (!clientName || !comment || !workedWithProfessional) {
-      alert(
-        'Veuillez remplir votre nom, ajouter un commentaire et confirmer que vous avez travaillé avec ce professionnel.'
+      setFormError(
+        'Veuillez remplir votre nom, ajouter un commentaire et cocher la case de confirmation.'
       );
       return;
     }
+    setFormError('');
 
     const overallRating =
       (qualityRating +
@@ -212,6 +240,7 @@ export default function ProfilePage() {
     setComment('');
     setWorkedWithProfessional(false);
     setReviewPhotoFiles([]);
+    setFormError('');
   };
 
   function copyLink() {
@@ -539,6 +568,12 @@ export default function ProfilePage() {
           />
           Je confirme avoir réellement travaillé avec ce professionnel.
         </label>
+
+        {formError && (
+          <p className="mb-3 rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+            {formError}
+          </p>
+        )}
 
         <button
           onClick={submitReview}
