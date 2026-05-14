@@ -1,5 +1,5 @@
 # Biso — Claude Code Instructions
-*Last updated: May 14, 2026 (session 2)*
+*Last updated: May 14, 2026 (session 3)*
 
 ## This is NOT the Next.js you know
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
@@ -23,7 +23,7 @@ French-language artisan marketplace for Côte d'Ivoire. Connects clients with tr
 | `/search` | Search page — fetches services live from Supabase |
 | `/profiles/[id]` | Full artisan profile |
 | `/artisan` | Artisan registration — two CTA buttons both linking to https://forms.gle/HrweW6rg45NZQvtEA: (1) hero section — white bg, terracotta text #B03A1A, font-weight 500, border-radius 12px, box-shadow; (2) bottom of page — full-width, terracotta bg, white text |
-| `/admin/profiles/new` | Admin: create profile |
+| `/admin/profiles/new` | Admin only: Create new artisan/company profile. Includes other_services text input field. |
 | `/admin/upload` | Admin: upload portfolio photos |
 | `/admin/reviews` | Admin: approve/reject reviews |
 | `/admin/analytics` | Admin: event analytics dashboard (1j/7j/14j/30j filters, Chart.js) |
@@ -111,6 +111,9 @@ export const supabase = createClient(
 - Service names are case-sensitive. Always use exact `name_fr` values.
 - Search filter uses exact match: `.some(ps => ps.services?.name_fr === serviceFilter)` — never `.includes()`.
 - **Current count: 29 services.** Added Graphisme, Jardinage, Paysagisme, Photographie; replaced Panneaux solaires with Energie Renouvelable. Full list in `biso_project_instructions.md`.
+
+### Profile & Content Rules
+- **`other_services`** — free text, optional. Displayed on `/profiles/[id]` below main services as inline muted text: `"Autres services · [value]"`. Not shown on search cards. Populated via admin form or directly in Supabase.
 
 ### Admin auth
 - Admin routes protected by `ADMIN_UPLOAD_KEY` environment variable — server-side only.
