@@ -58,6 +58,13 @@ export default function ArtisanPage() {
           Soyez contacté directement par des clients sérieux, partout en Côte
           d'Ivoire. Gratuit, simple, sans intermédiaire.
         </p>
+        <a
+          href="https://forms.gle/HrweW6rg45NZQvtEA"
+          target="_blank"
+          className="mt-5 block w-full rounded-xl bg-white py-4 text-center font-[400] text-brand"
+        >
+          Remplir le formulaire d'inscription
+        </a>
       </div>
 
       {/* Benefits */}
