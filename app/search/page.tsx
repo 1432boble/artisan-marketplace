@@ -8,28 +8,6 @@ import { cleanWhatsappNumber } from '@/lib/whatsapp';
 import { ArrowLeft, ChevronDown, MapPin } from 'lucide-react';
 import { track } from '@/lib/track';
 
-const SERVICE_OPTIONS = [
-  'Peinture',
-  'Ferraillage',
-  'Nettoyage',
-  'Froid & Climatisation',
-  'Électricité',
-  'Menuiserie bois',
-  'Carrelage',
-  'Plomberie',
-  'Plâtrerie (Plaquiste)',
-  'Menuiserie aluminium',
-  'Étanchéité',
-  'Couture / Tailleur',
-  'Panneaux solaires',
-  'Maçonnerie',
-  'Mécanique',
-];
-
-const SERVICE_SELECT_OPTIONS = [
-  { label: 'Tous les services', value: 'ALL_SERVICES' },
-  ...SERVICE_OPTIONS.map((s) => ({ label: s, value: s })),
-];
 
 const ZONE_SELECT_OPTIONS = [
   { label: "Toute la Côte d'Ivoire", value: 'ALL_ZONES' },
@@ -135,6 +113,7 @@ type TypeFilter = 'all' | 'artisan' | 'company';
 export default function SearchPage() {
   const [artisans, setArtisans] = useState<any[]>([]);
   const [filtered, setFiltered] = useState<any[]>([]);
+  const [services, setServices] = useState<string[]>([]);
   const [serviceFilter, setServiceFilter] = useState('');
   const [zoneFilter, setZoneFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
@@ -166,6 +145,16 @@ export default function SearchPage() {
       }
 
       setArtisans(data || []);
+
+      const { data: serviceData, error: serviceError } = await supabase
+        .from('services')
+        .select('name_fr')
+        .eq('is_active', true)
+        .order('name_fr', { ascending: true });
+
+      if (!serviceError && serviceData) {
+        setServices(serviceData.map((s) => s.name_fr));
+      }
     };
 
     fetchData();
@@ -181,11 +170,9 @@ export default function SearchPage() {
 
     if (serviceFilter && serviceFilter !== 'ALL_SERVICES') {
       result = result.filter((a) =>
-        a.profile_services
-          ?.map((ps: any) => ps.services?.name_fr)
-          .join(' ')
-          .toLowerCase()
-          .includes(serviceFilter.toLowerCase())
+        a.profile_services?.some(
+          (ps: any) => ps.services?.name_fr === serviceFilter
+        )
       );
     }
 
@@ -241,7 +228,10 @@ export default function SearchPage() {
           <CustomSelect
             value={serviceFilter}
             onChange={setServiceFilter}
-            options={SERVICE_SELECT_OPTIONS}
+            options={[
+              { label: 'Tous les services', value: 'ALL_SERVICES' },
+              ...services.map((s) => ({ label: s, value: s })),
+            ]}
             placeholder="Choisir un service"
           />
           <CustomSelect
