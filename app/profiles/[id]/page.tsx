@@ -305,6 +305,15 @@ export default function ProfilePage() {
             : 'Service non renseigné'}
         </p>
 
+        {profile.other_services && (
+          <div className="mt-3">
+            <p className="mb-1.5 text-xs font-[400] text-[#888888]">Autres services</p>
+            <span className="inline-block rounded-lg border border-[#888888] px-3 py-1 text-sm font-[400] text-[#888888]">
+              {profile.other_services}
+            </span>
+          </div>
+        )}
+
         <div className="mt-2">
           <StarRating rating={averageRating} count={reviews.length} />
         </div>

@@ -15,6 +15,7 @@ export async function POST(request: Request) {
       services,
       experience_years,
       description,
+      other_services,
     } = body;
 
     if (!contact_name || !phone || !profile_type) {
@@ -38,6 +39,7 @@ export async function POST(request: Request) {
         work_zones: work_zones ?? null,
         experience_years: experience_years ?? null,
         description: description ?? null,
+        other_services: other_services ?? null,
         status: 'approved',
         is_available: true,
         is_verified: false,

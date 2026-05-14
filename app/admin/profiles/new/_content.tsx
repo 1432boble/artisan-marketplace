@@ -49,6 +49,7 @@ export default function NewProfileContent() {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [experienceYears, setExperienceYears] = useState('');
   const [description, setDescription] = useState('');
+  const [otherServices, setOtherServices] = useState('');
 
   useEffect(() => {
     supabase
@@ -102,6 +103,7 @@ export default function NewProfileContent() {
         services: selectedServices,
         experience_years: experienceYears || null,
         description: description || null,
+        other_services: otherServices || null,
       }),
     });
 
@@ -258,6 +260,20 @@ export default function NewProfileContent() {
                 </label>
               ))}
             </div>
+          </div>
+
+          {/* Other services */}
+          <div>
+            <label className="mb-1 block text-sm font-semibold text-gray-700">
+              Autres services
+            </label>
+            <input
+              type="text"
+              className="w-full rounded border p-3 text-sm text-black"
+              value={otherServices}
+              onChange={(e) => setOtherServices(e.target.value)}
+              placeholder="Ex: Jardinage, Peinture murale"
+            />
           </div>
 
           {/* Experience years */}
