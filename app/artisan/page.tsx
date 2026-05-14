@@ -61,7 +61,7 @@ export default function ArtisanPage() {
         <a
           href="https://forms.gle/HrweW6rg45NZQvtEA"
           target="_blank"
-          className="mt-5 block w-full rounded-xl border-2 border-white bg-transparent py-4 text-center font-[400] text-white"
+          className="mt-5 inline-block rounded-xl bg-white px-8 py-4 text-center font-[400] text-brand"
         >
           Remplir le formulaire d'inscription
         </a>
