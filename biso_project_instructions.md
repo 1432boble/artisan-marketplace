@@ -150,7 +150,7 @@ Tailleur
 ### How new profiles are added
 
 1. **Artisan/entreprise submits Google Form**
-   URL: https://forms.gle/aVgXmnXDY54ny4ca9
+   URL: https://forms.gle/HrweW6rg45NZQvtEA
    Linked from landing page "Je suis artisan / entreprise" button → `/artisan` page → form
 
 2. **Admin reviews Google Sheet response**
@@ -261,7 +261,7 @@ Vous êtes, Nom de l'entreprise, Nom du contact, Numéro WhatsApp, Zones d'inter
 
 ## Admin contact
 - WhatsApp: 0758539476
-- Google Form: https://forms.gle/aVgXmnXDY54ny4ca9
+- Google Form: https://forms.gle/HrweW6rg45NZQvtEA
 
 ---
 

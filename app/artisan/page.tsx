@@ -115,7 +115,7 @@ export default function ArtisanPage() {
       {/* CTA */}
       <div className="mt-2 bg-white px-4 py-6">
         <a
-          href="https://forms.gle/aVgXmnXDY54ny4ca9"
+          href="https://forms.gle/HrweW6rg45NZQvtEA"
           target="_blank"
           className="block w-full rounded-xl bg-brand py-4 text-center font-[400] text-white"
         >
