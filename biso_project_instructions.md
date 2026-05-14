@@ -68,7 +68,7 @@ One font family throughout: **Fraunces** (Google Fonts). No other font.
 | `/search` | Search artisans by service and zone (shows all by default) |
 | `/profiles/[id]` | Full artisan profile — reviews, portfolio, WhatsApp + Call buttons, QR code, share |
 | `/artisan` | Artisan registration page — explains Biso, links to Google Form. Two CTA buttons: (1) hero section — white bg, terracotta text #B03A1A, font-weight 500, border-radius 12px, box-shadow; (2) bottom of page — full-width, terracotta bg, white text. Both link to the Google Form. |
-| `/admin/profiles/new` | **Admin only:** Create new artisan/company profile |
+| `/admin/profiles/new` | **Admin only:** Create new artisan/company profile. Includes other_services text input field. |
 | `/admin/upload` | **Admin only:** Upload portfolio photos for existing profiles |
 | `/admin/reviews` | **Admin only:** Approve/reject client reviews with photos |
 
@@ -211,6 +211,7 @@ Vous êtes, Nom de l'entreprise, Nom du contact, Numéro WhatsApp, Zones d'inter
 - **Profile page display:** all services, 3 per line
 - **Search filtering:** exact match on `name_fr` — uses `.some()` not `.includes()`
 - **Status:** new profiles default to `approved`, `is_available: true`, `is_verified: false`
+- **`other_services`** — free text, optional. Displayed on `/profiles/[id]` below main services as inline muted text: `"Autres services · value"`. Not shown on search cards. Populated via admin form or directly in Supabase.
 
 ---
 
