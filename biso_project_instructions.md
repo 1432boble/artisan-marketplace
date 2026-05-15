@@ -1,5 +1,5 @@
 # Biso — Project Instructions for Claude
-*Updated May 14, 2026 — reflects all fixes applied today*
+*Updated May 15, 2026 — reflects all fixes applied today*
 
 ---
 
@@ -79,6 +79,20 @@ Access pattern: `https://artisan-marketplace-phi.vercel.app/admin/[route]?key=YO
 - `components/StarRating.tsx` — star rating display
 - `components/TrackPageView.tsx` — page view tracking
 - No gallery component — portfolio gallery is inline in `app/profiles/[id]/page.tsx`
+
+---
+
+## PWA
+
+- **manifest.json** (`public/manifest.json`): name "Biso — Artisans de confiance", short_name "Biso", theme_color + background_color `#B03A1A`, display standalone. Includes 192×192, 512×512, and maskable 512×512 icon entries.
+- **Icons** — three PNG files in `public/`:
+  - `icon-512.png` — 512×512
+  - `icon-192.png` — 192×192
+  - `apple-touch-icon.png` — 180×180
+  - Design: terracotta `#B03A1A` bg with rounded corners, white bold Georgia "Biso" centered, ochre `#C8860A` rounded underline bar below text baseline.
+  - Generated with a Node.js script using the `sharp` package. Script is deleted after each run — recreate from scratch if icons need to be regenerated.
+- **layout.tsx `<head>`** includes: `<link rel="manifest">`, `<link rel="apple-touch-icon">`, `<meta name="theme-color" content="#B03A1A">`.
+- Service worker is registered in `layout.tsx` via inline script (`/sw.js`).
 
 ---
 

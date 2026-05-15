@@ -1,5 +1,5 @@
 # Biso — Claude Code Instructions
-*Last updated: May 14, 2026 (session 3)*
+*Last updated: May 15, 2026*
 
 ## This is NOT the Next.js you know
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
@@ -41,6 +41,20 @@ French-language artisan marketplace for Côte d'Ivoire. Connects clients with tr
 - Day range filter: **1j** (today from midnight), 7j, 14j, 30j
 - `lib/track.ts` — fire-and-forget POST to `/api/events` (errors silently swallowed)
 - `app/api/events/route.ts` — inserts into Supabase `events` table using service role key
+
+---
+
+## PWA
+
+- **manifest.json** (`public/manifest.json`): name "Biso — Artisans de confiance", short_name "Biso", theme_color + background_color `#B03A1A`, display standalone. Includes 192×192, 512×512, and maskable 512×512 icon entries.
+- **Icons** — three PNG files in `public/`:
+  - `icon-512.png` — 512×512
+  - `icon-192.png` — 192×192
+  - `apple-touch-icon.png` — 180×180
+  - Design: terracotta `#B03A1A` bg with rounded corners, white bold Georgia "Biso" centered, ochre `#C8860A` rounded underline bar below text baseline.
+  - Generated with a Node.js script using the `sharp` package. Script is deleted after each run — recreate from scratch if icons need to be regenerated.
+- **layout.tsx `<head>`** includes: `<link rel="manifest">`, `<link rel="apple-touch-icon">`, `<meta name="theme-color" content="#B03A1A">`.
+- Service worker is registered in `layout.tsx` via inline script (`/sw.js`).
 
 ---
 
