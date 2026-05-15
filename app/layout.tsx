@@ -25,6 +25,11 @@ export default function RootLayout({
       lang="fr"
       className={`${fraunces.variable} h-full antialiased`}
     >
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <meta name="theme-color" content="#B03A1A" />
+      </head>
       <body className="min-h-full flex flex-col">
   {children}
 

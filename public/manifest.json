@@ -1,11 +1,11 @@
 {
-  "name": "Artisan Marketplace",
-  "short_name": "Artisans",
+  "name": "Biso — Artisans de confiance",
+  "short_name": "Biso",
   "description": "Biso est une communauté de professionnels de confiance, recommandés pour leur sérieux, leur savoir-faire et la qualité de leurs réalisations.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f3f4f6",
-  "theme_color": "#111827",
+  "background_color": "#B03A1A",
+  "theme_color": "#B03A1A",
   "lang": "fr",
   "dir": "ltr",
   "icons": [
@@ -18,6 +18,12 @@
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
