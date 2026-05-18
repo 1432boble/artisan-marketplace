@@ -1,5 +1,5 @@
 # Biso — Claude Code Instructions
-*Last updated: May 15, 2026*
+*Last updated: May 18, 2026*
 
 ## This is NOT the Next.js you know
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
@@ -85,6 +85,7 @@ Verified:       #1A7A3C  (Vérifié badge)
 - Buttons: border-radius 12px, Fraunces 400, full width
 - Form fields: white bg, 1.5px solid #B03A1A border, border-radius 10–12px
 - Cards: white bg, 1px solid border, border-radius 14px, padding 14px
+- Search card service name: always `text-brand` (#B03A1A) — never conditional on profile type
 - Icons: Tabler Icons outline only (ti-* classes) — never emoji
 - Never use native `<select>` — custom styled dropdowns only
 
