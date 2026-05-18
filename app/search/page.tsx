@@ -340,11 +340,7 @@ export default function SearchPage() {
                 </div>
 
                 {/* Service */}
-                <p
-                  className={`mt-1 text-sm font-[500] ${
-                    a.profile_type === 'company' ? 'text-accent' : 'text-brand'
-                  }`}
-                >
+                <p className="mt-1 text-sm font-[500] text-brand">
                   {services.length > 0 ? services.join(', ') : 'Service non renseigné'}
                 </p>
 
