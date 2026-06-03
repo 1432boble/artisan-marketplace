@@ -1,25 +1,11 @@
 import { Suspense } from 'react';
+import { redirect } from 'next/navigation';
+import { isAuthed } from '@/lib/admin-auth';
 import UploadPageContent from './_content';
 
-export default async function UploadPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ key?: string }>;
-}) {
-  const { key } = await searchParams;
-  const expectedKey = process.env.ADMIN_UPLOAD_KEY;
-
-  if (!expectedKey || key !== expectedKey) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-gray-100 p-6">
-        <div className="rounded-xl bg-white p-6 text-center shadow">
-          <h1 className="text-xl font-bold text-gray-900">Accès non autorisé</h1>
-          <p className="mt-2 text-gray-600">
-            Cette page est réservée à l'administrateur.
-          </p>
-        </div>
-      </main>
-    );
+export default async function UploadPage() {
+  if (!(await isAuthed())) {
+    redirect('/admin/login?next=/admin/upload');
   }
 
   return (
@@ -30,7 +16,7 @@ export default async function UploadPage({
         </main>
       }
     >
-      <UploadPageContent adminKey={key as string} />
+      <UploadPageContent />
     </Suspense>
   );
 }

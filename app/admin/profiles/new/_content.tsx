@@ -35,7 +35,7 @@ const EXPERIENCE_OPTIONS = [
 
 type Service = { id: string; name_fr: string };
 
-export default function NewProfileContent({ adminKey }: { adminKey: string }) {
+export default function NewProfileContent() {
   const router = useRouter();
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(false);
@@ -91,7 +91,7 @@ export default function NewProfileContent({ adminKey }: { adminKey: string }) {
 
     const res = await fetch('/api/admin/create-profile', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         profile_type: profileType,
         company_name: companyName || null,

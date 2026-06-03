@@ -130,14 +130,18 @@ export const supabase = createClient(
 ### Profile & Content Rules
 - **`other_services`** — free text, optional. Displayed on `/profiles/[id]` below main services as inline muted text: `"Autres services · [value]"`. Not shown on search cards. Populated via admin form or directly in Supabase.
 
-### Admin auth
-- Admin routes protected by `ADMIN_UPLOAD_KEY` environment variable — server-side only.
-- Never expose with `NEXT_PUBLIC_` prefix.
-- Access pattern (pages): `/admin/[route]?key=YOUR_KEY` — server component validates `key` against `ADMIN_UPLOAD_KEY`.
-- **Admin API routes are guarded too.** `lib/admin-auth.ts` exports `requireAdmin(req)` which checks the `x-admin-key` request header against `ADMIN_UPLOAD_KEY` and returns 401 if it doesn't match. Call it at the top of every `/api/admin/*` and `/api/upload` handler: `const denied = requireAdmin(req); if (denied) return denied;`
-- Admin pages pass their validated key down to the client `_content` component as the `adminKey` prop, which sends it as the `x-admin-key` header on every protected fetch.
-- **Public (ungated) API routes:** `/api/events` (tracking) and `/api/get-profiles` (approved profiles only). Everything else under `/api/admin/*` plus `/api/upload` requires the key.
-- Known limitation: the key currently travels in the page URL and the client bundle. Hardening (header/cookie auth, strong rotated key, no key in URL) is a planned follow-up.
+### Admin auth — cookie session (no key in URL)
+- The admin password is the `ADMIN_UPLOAD_KEY` env var — server-side only, never `NEXT_PUBLIC_`. Use a long, random value (rotate it if it ever leaks).
+- **Login flow:** `/admin/login` → password posted to `POST /api/admin/login` → on success sets an **HttpOnly, SameSite=Lax** cookie `biso_admin` (value = SHA-256 of the secret, never the secret itself; `Secure` in production). `POST /api/admin/logout` clears it. Session lasts 30 days.
+- **`lib/admin-auth.ts`** is the single source of truth:
+  - `isAuthed()` — async; reads the cookie. Used by server components.
+  - `requireAdmin()` — async; returns a 401 `NextResponse` or `null`. Call at the top of every protected route handler: `const denied = await requireAdmin(); if (denied) return denied;`
+  - `checkPassword()` / `sessionToken()` — used by the login route only.
+- **Admin pages** (`/admin`, `/admin/analytics`, `/admin/reviews`, `/admin/upload`, `/admin/profiles/new`) are server components that call `isAuthed()` and `redirect('/admin/login?next=…')` when not authed. `/admin` is the hub linking to all tools + logout.
+- **Client `_content` components** send no credential — the cookie rides along automatically on same-origin fetches. Never reintroduce a key prop or `x-admin-key` header.
+- **Protected API routes:** all `/api/admin/*` (events, reviews, create-profile, login*, logout*) plus `/api/upload`. (*login/logout don't call `requireAdmin` — they establish/clear the session.)
+- **Public (ungated) API routes:** `/api/events` (tracking) and `/api/get-profiles` (approved profiles only).
+- `ADMIN_UPLOAD_KEY` must be set in **both** `.env.local` (local) and Vercel env vars (production) — they should match.
 
 ### Environment variables
 - Never commit `.env.local`, `.claude/`, or `.mcp.json`

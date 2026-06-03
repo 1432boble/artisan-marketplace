@@ -7,8 +7,8 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-export async function GET(req: Request) {
-  const denied = requireAdmin(req);
+export async function GET() {
+  const denied = await requireAdmin();
   if (denied) return denied;
 
   const { data, error } = await supabase
@@ -31,7 +31,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const denied = requireAdmin(req);
+  const denied = await requireAdmin();
   if (denied) return denied;
 
   const body = await req.json();

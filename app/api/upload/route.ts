@@ -8,7 +8,7 @@ const supabase = createClient(
 );
 
 export async function POST(req: Request) {
-  const denied = requireAdmin(req);
+  const denied = await requireAdmin();
   if (denied) return denied;
 
   try {

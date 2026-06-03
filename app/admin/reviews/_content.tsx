@@ -2,16 +2,14 @@
 
 import { useEffect, useState } from 'react';
 
-export default function AdminReviewsContent({ adminKey }: { adminKey: string }) {
+export default function AdminReviewsContent() {
   const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchReviews = async () => {
     setLoading(true);
 
-    const res = await fetch('/api/admin/reviews', {
-      headers: { 'x-admin-key': adminKey },
-    });
+    const res = await fetch('/api/admin/reviews');
     const data = await res.json();
 
     if (Array.isArray(data)) {
@@ -31,7 +29,7 @@ export default function AdminReviewsContent({ adminKey }: { adminKey: string }) 
   const updateReviewStatus = async (reviewId: string, status: 'approved' | 'rejected') => {
     const res = await fetch('/api/admin/reviews', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ reviewId, status }),
     });
 
