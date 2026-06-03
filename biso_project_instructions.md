@@ -139,11 +139,12 @@ Démolition, Domotique, Électricité, Energie renouvelable, Étanchéité,
 Excavation, Ferraillage, Froid & Climatisation, Graphisme, Jardinage,
 Maçonnerie, Mécanique, Menuiserie aluminium, Menuiserie bois,
 Menuiserie métallique, Nettoyage, Paysagisme, Peinture, Photographie,
-Plâtrerie, Plomberie, Sécurité électronique, Tailleur
+Piscine, Plâtrerie, Plomberie, Plombier-gazier, Sécurité électronique,
+Tailleur
 
 ---
 
-## Services List (29 services — must match `services` table `name_fr` exactly)
+## Services List (30 services — must match `services` table `name_fr` exactly)
 
 ```
 Architecte
@@ -170,8 +171,10 @@ Nettoyage
 Paysagisme
 Peinture
 Photographie
+Piscine
 Plâtrerie
 Plomberie
+Plombier-gazier
 Sécurité électronique
 Tailleur
 ```

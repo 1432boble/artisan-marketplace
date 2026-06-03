@@ -125,7 +125,7 @@ export const supabase = createClient(
 - The search dropdown fetches live from Supabase with `is_active = true`. Adding a service = insert a row in Supabase. No code change needed.
 - Service names are case-sensitive. Always use exact `name_fr` values.
 - Search filter uses exact match: `.some(ps => ps.services?.name_fr === serviceFilter)` — never `.includes()`.
-- **Current count: 29 services.** Added Graphisme, Jardinage, Paysagisme, Photographie; replaced Panneaux solaires with Energie Renouvelable. Full list in `biso_project_instructions.md`.
+- **Current count: 30 services.** Added Graphisme, Jardinage, Paysagisme, Photographie, Piscine, Plombier-gazier; replaced Panneaux solaires with Energie Renouvelable. Full list in `biso_project_instructions.md`.
 
 ### Profile & Content Rules
 - **`other_services`** — free text, optional. Displayed on `/profiles/[id]` below main services as inline muted text: `"Autres services · [value]"`. Not shown on search cards. Populated via admin form or directly in Supabase.
