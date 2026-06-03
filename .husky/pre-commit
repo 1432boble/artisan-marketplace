@@ -1,0 +1,22 @@
+# Biso pre-commit checks — block debug logging and type errors before they land.
+
+# 1. Block newly-added console.log / console.debug in staged TS/TSX files.
+files=$(git diff --cached --name-only --diff-filter=ACM -- '*.ts' '*.tsx')
+if [ -n "$files" ]; then
+  if git diff --cached -U0 -- $files | grep -nE '^\+.*console\.(log|debug)\(' >/dev/null; then
+    echo "✖ Commit blocked: new console.log/console.debug in staged changes."
+    echo "  Remove debug logging and fix the root cause instead (never commit logs as a fix)."
+    git diff --cached -U0 -- $files | grep -nE '^\+.*console\.(log|debug)\('
+    echo "  (If you truly need this, bypass with: git commit --no-verify)"
+    exit 1
+  fi
+fi
+
+# 2. Type check — catches build-breakers like unescaped apostrophes in string literals.
+echo "→ Type checking (tsc --noEmit)…"
+if ! npm run --silent typecheck; then
+  echo "✖ Commit blocked: TypeScript errors above. Fix them, then commit again."
+  exit 1
+fi
+
+echo "✓ Pre-commit checks passed."
