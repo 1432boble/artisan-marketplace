@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-export default function UploadPageContent() {
+export default function UploadPageContent({ adminKey }: { adminKey: string }) {
   const [profiles, setProfiles] = useState<any[]>([]);
   const [selectedProfile, setSelectedProfile] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -35,6 +35,7 @@ export default function UploadPageContent() {
 
     const res = await fetch('/api/upload', {
       method: 'POST',
+      headers: { 'x-admin-key': adminKey },
       body: formData,
     });
 

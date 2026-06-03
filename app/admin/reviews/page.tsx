@@ -30,7 +30,7 @@ export default async function AdminReviewsPage({
         </main>
       }
     >
-      <AdminReviewsContent />
+      <AdminReviewsContent adminKey={key as string} />
     </Suspense>
   );
 }

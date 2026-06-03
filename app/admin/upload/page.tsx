@@ -30,7 +30,7 @@ export default async function UploadPage({
         </main>
       }
     >
-      <UploadPageContent />
+      <UploadPageContent adminKey={key as string} />
     </Suspense>
   );
 }

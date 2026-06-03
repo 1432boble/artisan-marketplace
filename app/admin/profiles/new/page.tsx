@@ -30,7 +30,7 @@ export default async function NewProfilePage({
         </main>
       }
     >
-      <NewProfileContent />
+      <NewProfileContent adminKey={key as string} />
     </Suspense>
   );
 }

@@ -53,7 +53,7 @@ const LABELS: Record<string, string> = {
   whatsapp_click: 'WhatsApp',
 };
 
-export default function AnalyticsContent() {
+export default function AnalyticsContent({ adminKey }: { adminKey: string }) {
   const [days, setDays] = useState<DayRange>(7);
   const [events, setEvents] = useState<EventRow[]>([]);
   const [profiles, setProfiles] = useState<ProfileRow[]>([]);
@@ -62,7 +62,7 @@ export default function AnalyticsContent() {
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/admin/events')
+    fetch('/api/admin/events', { headers: { 'x-admin-key': adminKey } })
       .then((r) => r.json())
       .then((data) => {
         if (data.error) {

@@ -30,7 +30,7 @@ export default async function AdminAnalyticsPage({
         </main>
       }
     >
-      <AnalyticsContent />
+      <AnalyticsContent adminKey={key as string} />
     </Suspense>
   );
 }

@@ -133,7 +133,11 @@ export const supabase = createClient(
 ### Admin auth
 - Admin routes protected by `ADMIN_UPLOAD_KEY` environment variable — server-side only.
 - Never expose with `NEXT_PUBLIC_` prefix.
-- Access pattern: `/admin/[route]?key=YOUR_KEY`
+- Access pattern (pages): `/admin/[route]?key=YOUR_KEY` — server component validates `key` against `ADMIN_UPLOAD_KEY`.
+- **Admin API routes are guarded too.** `lib/admin-auth.ts` exports `requireAdmin(req)` which checks the `x-admin-key` request header against `ADMIN_UPLOAD_KEY` and returns 401 if it doesn't match. Call it at the top of every `/api/admin/*` and `/api/upload` handler: `const denied = requireAdmin(req); if (denied) return denied;`
+- Admin pages pass their validated key down to the client `_content` component as the `adminKey` prop, which sends it as the `x-admin-key` header on every protected fetch.
+- **Public (ungated) API routes:** `/api/events` (tracking) and `/api/get-profiles` (approved profiles only). Everything else under `/api/admin/*` plus `/api/upload` requires the key.
+- Known limitation: the key currently travels in the page URL and the client bundle. Hardening (header/cookie auth, strong rotated key, no key in URL) is a planned follow-up.
 
 ### Environment variables
 - Never commit `.env.local`, `.claude/`, or `.mcp.json`
