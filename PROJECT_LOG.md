@@ -23,6 +23,7 @@
 | May 14, 2026 (session 2) | ~1h | Descriptions written for Domotis and BAT-X. other_services field live end-to-end: profile page display (inline muted style), admin form input, 5 profiles updated in Supabase. CLAUDE.md and PROJECT_LOG.md updated. |
 | May 15, 2026 | ~1h | PWA icons generated (512/192/180px): terracotta bg, white bold Georgia "Biso", ochre underline bar. manifest.json updated (name, short_name, theme_color). layout.tsx updated with manifest link, apple-touch-icon, theme-color meta. Multiple icon iterations to fix underline position and text padding. |
 | May 18, 2026 | ~15min | Fixed service name color on search cards — unified to terracotta #B03A1A for all profile types (was conditionally ochre for companies). Commit 26518a1. |
+| June 3, 2026 | ~1.5h | Security + tooling session. Closed unauthenticated admin API access, then replaced the `?key=` URL gate with an HttpOnly cookie session (`/admin/login` + `/admin` hub + logout, SHA-256 token in `lib/admin-auth.ts`). Added Husky pre-commit hook (blocks new console.log + TS errors), then cleared all 35 ESLint errors and enforced lint in the hook. Commits 5ab1f0e, 1d5fbac, ec913fd, f9fb7a6. |
 
 ## How to Use This File
 - Update Labor Log at the end of every session

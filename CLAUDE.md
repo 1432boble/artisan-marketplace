@@ -1,5 +1,5 @@
 # Biso — Claude Code Instructions
-*Last updated: May 18, 2026*
+*Last updated: June 3, 2026*
 
 ## This is NOT the Next.js you know
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
