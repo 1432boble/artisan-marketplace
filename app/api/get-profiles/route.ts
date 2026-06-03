@@ -22,8 +22,9 @@ export async function GET() {
 
     return NextResponse.json(approved);
 
-  } catch (err: any) {
+  } catch (err) {
     console.error('Server error:', err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    const message = err instanceof Error ? err.message : 'Erreur serveur';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

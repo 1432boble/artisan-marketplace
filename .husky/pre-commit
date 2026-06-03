@@ -19,4 +19,11 @@ if ! npm run --silent typecheck; then
   exit 1
 fi
 
+# 3. Lint — ESLint errors block the commit; warnings are allowed.
+echo "→ Linting (eslint)…"
+if ! npm run --silent lint; then
+  echo "✖ Commit blocked: ESLint errors above. Fix them, then commit again."
+  exit 1
+fi
+
 echo "✓ Pre-commit checks passed."

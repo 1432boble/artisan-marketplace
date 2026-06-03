@@ -378,7 +378,7 @@ export default function SearchPage() {
                 </div>
               </div>
             );
-            } catch (e) {
+            } catch {
               return null;
             }
           })}

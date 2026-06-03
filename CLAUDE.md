@@ -186,6 +186,19 @@ export const supabase = createClient(
 
 ---
 
+## Code Quality Gate
+
+- **Pre-commit hook** (`.husky/pre-commit`, via Husky) runs on every commit and **blocks** on:
+  1. newly-added `console.log` / `console.debug` in staged TS/TSX,
+  2. TypeScript errors (`npm run typecheck`),
+  3. ESLint errors (`npm run lint` → `eslint .`). ESLint **warnings do not block**.
+- Bypass only when truly necessary and intentional: `git commit --no-verify`.
+- **ESLint config** (`eslint.config.mjs`) intentionally relaxes three rules — see comments there:
+  - `react/no-unescaped-entities`: off (French copy is full of apostrophes; render-safe).
+  - `@typescript-eslint/no-explicit-any`: warn (Supabase payloads are dynamic).
+  - `react-hooks/set-state-in-effect`: warn (search page derives state in an effect).
+- **Known follow-ups** (currently warnings): generate Supabase types (`supabase gen types typescript`) to replace the `any`s; refactor the `/search` filter effect to `useMemo`; swap `<img>` for `next/image` where appropriate.
+
 ## After Every Session
 
 1. Commit and push so Vercel auto-deploys
