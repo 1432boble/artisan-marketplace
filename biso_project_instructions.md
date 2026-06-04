@@ -1,5 +1,16 @@
-# Biso — Project Instructions for Claude
-*Updated June 3, 2026 — admin auth section synced with CLAUDE.md (cookie sessions)*
+# Biso — Project Instructions for Claude (chat / planning side)
+*Updated June 3, 2026*
+
+> **Two-file setup — read this first.**
+> - **`CLAUDE.md`** is the **technical source of truth** (used by Claude Code): routes,
+>   components, Supabase schema, design tokens, admin auth, code rules, quality gate.
+> - **This file** is the **planning / chat side**: business context, roadmap, the artisan
+>   intake workflow, the Google Form, the services list, and how we work together.
+>
+> To avoid the two drifting apart, technical details live in **CLAUDE.md only** — this
+> file points there instead of repeating them. Update whichever file owns the thing you
+> changed; update **both** only when you change the **services list** (see the sync
+> checklist below).
 
 ---
 
@@ -11,116 +22,14 @@ Three equal user groups: Clients, Artisans/Companies, and Admins.
 
 **Business goal:** Reach 500 active artisan profiles within 6-12 months and establish Biso as the market leader in this sector and region. Monetization model is not yet decided — do not suggest features that assume a specific revenue model without discussing it first.
 
----
+**Tech stack at a glance:** Next.js 16 (App Router), React 19, Tailwind CSS 4, Supabase (Postgres + Storage), deployed on Vercel (auto-deploys from GitHub `main`).
+- Repo: https://github.com/1432boble/artisan-marketplace
+- Live: artisan-marketplace-phi.vercel.app
+- Local: `C:\Users\robotemb\OneDrive\App\GitHub\artisan-marketplace\artisan-marketplace`
 
-## Tech Stack
-
-- **Framework:** Next.js 16 (App Router)
-- **Frontend:** React 19, Tailwind CSS 4
-- **Database:** Supabase (PostgreSQL + Storage)
-- **Deployment:** Vercel (auto-deploys from GitHub main branch)
-- **Repo:** https://github.com/1432boble/artisan-marketplace
-- **Local path:** `C:\Users\robotemb\OneDrive\App\GitHub\artisan-marketplace\artisan-marketplace`
-- **Live app:** artisan-marketplace-phi.vercel.app
-
----
-
-## Design System
-
-### Typography
-One font family throughout: **Fraunces** (Google Fonts). No other font.
-
-| Weight | Usage |
-|---|---|
-| 300 | Body text, descriptions, muted copy, form labels |
-| 400 | Buttons, badges, placeholders, general UI |
-| 500 | Names, headings, section titles, stat numbers, trade labels |
-| Italic 300–400 | Manifesto emphasis only |
-
-### Color Palette
-
-| Name | Hex | Usage |
-|---|---|---|
-| --brand (terracotta) | #B03A1A | Logo, primary buttons, borders, icons, badges, titles |
-| --brand-light | #F9EDE8 | Icon backgrounds, artisan badge fill |
-| --accent (ochre) | #C8860A | Star ratings, entreprise badge |
-| --accent-light | #FDF3DC | Entreprise badge background |
-| --ink | #111111 | Primary text |
-| --muted | #888888 | Secondary text, descriptions, meta |
-| --border | rgba(0,0,0,0.09) | Dividers and card borders |
-| --bg | #F7F7F7 | Page and card backgrounds |
-| WhatsApp green | #25D366 | WhatsApp buttons only |
-| Verified green | #1A7A3C | Vérifié badge |
-
-### Component Rules
-- **Buttons:** border-radius 12px, Fraunces 400, full width
-- **Form fields:** white bg, 1.5px solid #B03A1A border, border-radius 10–12px — never native `<select>` tags
-- **Icons:** Tabler Icons outline only (ti-* classes) — never emoji
-- **Cards:** white bg, 1px solid border, border-radius 14px, padding 14px
-
----
-
-## Current App Structure
-
-| Route | Description |
-|---|---|
-| `/` | Landing page |
-| `/search` | Search artisans by service and zone (shows all by default) |
-| `/profiles/[id]` | Full artisan profile — reviews, portfolio, WhatsApp + Call buttons, QR code, share |
-| `/artisan` | Artisan registration page — explains Biso, links to Google Form. Two CTA buttons: (1) hero section — white bg, terracotta text #B03A1A, font-weight 500, border-radius 12px, box-shadow; (2) bottom of page — full-width, terracotta bg, white text. Both link to the Google Form. |
-| `/admin/profiles/new` | **Admin only:** Create new artisan/company profile. Includes other_services text input field. |
-| `/admin/upload` | **Admin only:** Upload portfolio photos for existing profiles |
-| `/admin/reviews` | **Admin only:** Approve/reject client reviews with photos |
-
-All admin routes are protected server-side via a cookie session — **no key in the URL**.
-Login at `/admin/login` (password = `ADMIN_UPLOAD_KEY`) sets an HttpOnly `biso_admin`
-cookie; pages redirect unauthed visitors to `/admin/login?next=…`. See CLAUDE.md
-("Admin auth — cookie session") for the full flow and `lib/admin-auth.ts`.
-
-### Components
-- `components/StarRating.tsx` — star rating display
-- `components/TrackPageView.tsx` — page view tracking
-- No gallery component — portfolio gallery is inline in `app/profiles/[id]/page.tsx`
-
----
-
-## PWA
-
-- **manifest.json** (`public/manifest.json`): name "Biso — Artisans de confiance", short_name "Biso", theme_color + background_color `#B03A1A`, display standalone. Includes 192×192, 512×512, and maskable 512×512 icon entries.
-- **Icons** — three PNG files in `public/`:
-  - `icon-512.png` — 512×512
-  - `icon-192.png` — 192×192
-  - `apple-touch-icon.png` — 180×180
-  - Design: terracotta `#B03A1A` bg with rounded corners, white bold Georgia "Biso" centered, ochre `#C8860A` rounded underline bar below text baseline.
-  - Generated with a Node.js script using the `sharp` package. Script is deleted after each run — recreate from scratch if icons need to be regenerated.
-- **layout.tsx `<head>`** includes: `<link rel="manifest">`, `<link rel="apple-touch-icon">`, `<meta name="theme-color" content="#B03A1A">`.
-- Service worker is registered in `layout.tsx` via inline script (`/sw.js`).
-
----
-
-## Supabase Schema
-
-### `profiles` table
-`id, profile_type, contact_name, company_name, phone, whatsapp, main_location, work_zones, description, experience_years, is_available, is_verified, status, created_at, other_services, main_service_name`
-
-### `profile_services` table (junction)
-`id, profile_id, service_id, is_primary, created_at`
-Links profiles to the `services` table. First service = is_primary true.
-
-### `services` table
-`id, name_fr, name_en, category, is_active, created_at`
-
-⚠️ **The `services` table is the single source of truth for all service names.**
-- Never hardcode service names in frontend code
-- The search dropdown fetches live from Supabase — adding a row here is all that's needed
-- Always use the exact `name_fr` value — case-sensitive
-
-### `reviews` table
-Includes a `photos` column (text[]) for client-uploaded review photos.
-
-### Storage buckets
-- `portfolio-photos` — admin-uploaded artisan portfolio images
-- `review-photos` — client-uploaded photos attached to reviews
+> Routes, components, PWA, Supabase schema, design system (fonts/colors/component
+> rules), error handling, and admin auth are all documented in **CLAUDE.md** — refer
+> there rather than duplicating them here.
 
 ---
 
@@ -132,21 +41,16 @@ following must be updated in the same session before closing:
 
 1. **Supabase** `services` table — add/edit/deactivate the service
 2. **Google Form** — add/remove the checkbox in "Service principal"
-3. **`/admin/profiles/new`** — add/remove the checkbox in the service list
-4. **`biso_project_instructions.md`** — update the services list below
+3. **`/admin/profiles/new`** — no code change needed; the form fetches services
+   live from Supabase (`is_active = true`), so the checkbox appears automatically
+4. **This file** — update the services list below
+5. **CLAUDE.md** — update the service count line under "Critical Rules → Services"
 
-### Current services list (must match Supabase `name_fr`, alphabetical)
-Architecte, Architecte d'intérieur, Carrelage, Charpenterie, Coffrage,
-Démolition, Domotique, Électricité, Energie renouvelable, Étanchéité,
-Excavation, Ferraillage, Froid & Climatisation, Graphisme, Jardinage,
-Maçonnerie, Mécanique, Menuiserie aluminium, Menuiserie bois,
-Menuiserie métallique, Nettoyage, Paysagisme, Peinture, Photographie,
-Piscine, Plâtrerie, Plomberie, Plombier-gazier, Sécurité électronique,
-Tailleur
+> **Adding a new service:** insert a row in Supabase `services` with the correct
+> `name_fr` and `is_active = true`. The search dropdown and the admin form both update
+> automatically — no frontend code change needed.
 
----
-
-## Services List (30 services — must match `services` table `name_fr` exactly)
+### Services List (30 services — must match Supabase `name_fr` exactly, alphabetical)
 
 ```
 Architecte
@@ -180,8 +84,6 @@ Plombier-gazier
 Sécurité électronique
 Tailleur
 ```
-
-**Adding a new service:** Insert a row in Supabase `services` table with the correct `name_fr` and `is_active = true`. The search dropdown updates automatically — no code change needed.
 
 ---
 
@@ -220,7 +122,7 @@ Vous êtes, Nom de l'entreprise, Nom du contact, Numéro WhatsApp, Zones d'inter
 
 ---
 
-## Profile & Content Rules
+## Content Rules (for writing/editing profiles)
 
 - **Profile type:** `artisan` or `company`
 - **Names:** minimum "Prénom + initiale" — never first name only
@@ -228,36 +130,22 @@ Vous êtes, Nom de l'entreprise, Nom du contact, Numéro WhatsApp, Zones d'inter
 - **Services:** multi-select — multiple services per profile supported
 - **Search card display:** max 2 lines of services (4 services), then "+ X autres"
 - **Profile page display:** all services, 3 per line
-- **Search filtering:** exact match on `name_fr` — uses `.some()` not `.includes()`
-- **Status:** new profiles default to `approved`, `is_available: true`, `is_verified: false`
-- **`other_services`** — free text, optional. Displayed on `/profiles/[id]` below main services as inline muted text: `"Autres services · value"`. Not shown on search cards. Populated via admin form or directly in Supabase.
+- **`other_services`:** free text, optional; shown on the profile page as muted
+  `"Autres services · value"`, not on search cards
+
+> Field-level schema and the exact search-filter implementation live in **CLAUDE.md**.
 
 ---
 
-## Review System
+## Review System (product behavior)
 
 - Reviews require admin approval before appearing publicly
 - Clients can attach up to 3 photos per review (camera or gallery)
-- Photos are uploaded to `review-photos` Supabase bucket (compressed client-side before upload)
+- Photos upload to the `review-photos` Supabase bucket (compressed client-side)
 - Admin sees photos in `/admin/reviews` before approving
-- Approved review photos appear as thumbnails under the review comment — tap to enlarge (lightbox)
+- Approved review photos appear as thumbnails under the comment — tap to enlarge (lightbox)
 - Review photos do NOT appear in the portfolio section (kept separate for trust)
-- Review form has client-side validation — shows inline red error if name, comment, or confirmation checkbox is missing
-
----
-
-## Portfolio Gallery
-
-- Photos displayed in a grid (2 columns) in the Réalisations section
-- Gallery is inline in `app/profiles/[id]/page.tsx` — no separate component
-- Section hidden if no photos uploaded
-
----
-
-## Error Handling
-
-- **Invalid profile UUID:** Shows "Profil introuvable" screen with "Retour aux artisans" button — does not spin indefinitely
-- **Unknown route (404):** Custom `app/not-found.tsx` shows styled "Page introuvable" screen with "Retour à l'accueil" button — not the bare black Next.js default
+- Review form has client-side validation (name, comment, confirmation checkbox)
 
 ---
 
@@ -269,7 +157,6 @@ Vous êtes, Nom de l'entreprise, Nom du contact, Numéro WhatsApp, Zones d'inter
 - Always commit and push after every session so Vercel auto-deploys
 - Test on mobile after every visible change — target user is on a phone
 - Never add features not needed for MVP without discussing first
-- Use Claude in Chrome extension to validate live app after deploys
 
 ---
 
@@ -289,31 +176,17 @@ Vous êtes, Nom de l'entreprise, Nom du contact, Numéro WhatsApp, Zones d'inter
 
 ---
 
-## Known Decisions
+## Product Decisions (non-technical)
 
-- Admin auth: cookie session (`/admin/login` → HttpOnly `biso_admin` cookie), password is server-side `ADMIN_UPLOAD_KEY` — never expose with `NEXT_PUBLIC_` prefix, never put the key in a URL
 - WhatsApp is the primary contact method — no in-app messaging
 - No `/register` page — "Je suis artisan / entreprise" routes to `/artisan` then Google Form
 - "Appeler" button on profile pages only — not on search cards
-- `SUPABASE_SERVICE_ROLE_KEY` must be used in all admin API routes (not anon key)
-- `service_role` has been granted INSERT/UPDATE/DELETE on `profiles` and `profile_services`
-- Services dropdown fetches live from Supabase — never hardcode service names in frontend
-- Search filter uses exact match (`.some()`) on `name_fr` — not fuzzy `.includes()`
+- New profiles default to `approved`, `is_available: true`, `is_verified: false`
+
+> Technical decisions (admin cookie auth, service-role usage, env-var rules, search
+> exact-match, "never hardcode service names", etc.) are documented in **CLAUDE.md →
+> Known Decisions / Critical Rules**.
 
 ## Admin contact
 - WhatsApp: 0758539476
 - Google Form: https://forms.gle/HrweW6rg45NZQvtEA
-
----
-
-## What to Avoid
-
-- Do not suggest features that significantly increase complexity before reaching 500 artisans
-- Do not expose any environment variables with `NEXT_PUBLIC_` prefix unless truly public
-- Do not commit `.env.local`, `.claude/`, or `.mcp.json` to GitHub
-- Do not add buttons or UI elements that duplicate existing functionality
-- Do not make design changes without considering mobile view first
-- Do not use native `<select>` elements — custom styled dropdowns only
-- Do not use emoji as icons — Tabler outline icons only
-- Do not mix fonts — Fraunces only
-- Do not hardcode service names, zone names, or any data that lives in Supabase
