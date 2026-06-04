@@ -275,7 +275,7 @@ Vous êtes, Nom de l'entreprise, Nom du contact, Numéro WhatsApp, Zones d'inter
 
 ## Current Priorities
 
-1. **Content** — reach 20–30 clean artisan profiles before public launch (currently 13)
+1. **Content** — reach 20–30 clean profiles before public launch (currently 28: 13 artisans + 15 companies, all approved — target essentially met)
 2. **SEO meta tags** — improve Google discoverability
 3. **Service worker** — offline PWA support for low-connectivity users
 4. **Monetization** — to be decided when profile count reaches 50+
