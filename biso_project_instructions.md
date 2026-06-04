@@ -1,5 +1,5 @@
 # Biso — Project Instructions for Claude
-*Updated May 15, 2026 — reflects all fixes applied today*
+*Updated June 3, 2026 — admin auth section synced with CLAUDE.md (cookie sessions)*
 
 ---
 
@@ -72,8 +72,10 @@ One font family throughout: **Fraunces** (Google Fonts). No other font.
 | `/admin/upload` | **Admin only:** Upload portfolio photos for existing profiles |
 | `/admin/reviews` | **Admin only:** Approve/reject client reviews with photos |
 
-All admin routes are protected server-side with `ADMIN_UPLOAD_KEY`.
-Access pattern: `https://artisan-marketplace-phi.vercel.app/admin/[route]?key=YOUR_KEY`
+All admin routes are protected server-side via a cookie session — **no key in the URL**.
+Login at `/admin/login` (password = `ADMIN_UPLOAD_KEY`) sets an HttpOnly `biso_admin`
+cookie; pages redirect unauthed visitors to `/admin/login?next=…`. See CLAUDE.md
+("Admin auth — cookie session") for the full flow and `lib/admin-auth.ts`.
 
 ### Components
 - `components/StarRating.tsx` — star rating display
@@ -289,7 +291,7 @@ Vous êtes, Nom de l'entreprise, Nom du contact, Numéro WhatsApp, Zones d'inter
 
 ## Known Decisions
 
-- Admin auth: server-side `ADMIN_UPLOAD_KEY` — never expose with `NEXT_PUBLIC_` prefix
+- Admin auth: cookie session (`/admin/login` → HttpOnly `biso_admin` cookie), password is server-side `ADMIN_UPLOAD_KEY` — never expose with `NEXT_PUBLIC_` prefix, never put the key in a URL
 - WhatsApp is the primary contact method — no in-app messaging
 - No `/register` page — "Je suis artisan / entreprise" routes to `/artisan` then Google Form
 - "Appeler" button on profile pages only — not on search cards
