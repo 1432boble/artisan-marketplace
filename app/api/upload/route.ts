@@ -16,6 +16,7 @@ export async function POST(req: Request) {
 
     const file = formData.get('file') as File | null;
     const profile_id = formData.get('profile_id') as string | null;
+    const is_featured = formData.get('is_featured') === 'true';
 
     if (!file || !profile_id) {
       return NextResponse.json(
@@ -48,7 +49,7 @@ export async function POST(req: Request) {
     const { error: dbError } = await supabase.from('portfolio_photos').insert({
       profile_id,
       photo_url: publicUrlData.publicUrl,
-      is_featured: false,
+      is_featured,
     });
 
     if (dbError) {
