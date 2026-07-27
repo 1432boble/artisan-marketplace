@@ -24,10 +24,12 @@ French-language artisan marketplace for Côte d'Ivoire. Connects clients with tr
 | `/profiles/[id]` | Full artisan profile |
 | `/artisan` | Artisan registration — two CTA buttons both linking to https://forms.gle/HrweW6rg45NZQvtEA: (1) hero section — white bg, terracotta text #B03A1A, font-weight 500, border-radius 12px, box-shadow; (2) bottom of page — full-width, terracotta bg, white text |
 | `/admin/profiles/new` | Admin only: Create new artisan/company profile. Includes other_services text input field. |
-| `/admin/upload` | Admin: upload portfolio photos |
+| `/admin/upload` | Admin: upload portfolio photos — **multi-photo batch upload** (see "Photo upload" below) |
 | `/admin/reviews` | Admin: approve/reject reviews |
 | `/admin/analytics` | Admin: event analytics dashboard (1j/7j/14j/30j filters, Chart.js) |
 | `app/not-found.tsx` | Custom 404 page |
+
+> **Live profiles (July 27, 2026): 44 approved** — 28 artisans + 16 companies. Latest: **HK Bâtiment** (artisan indépendant — Peinture + Peinture décorative/Enduits, Toute la Côte d'Ivoire, 10+ ans, WhatsApp `2250173700713`). `contact_name` is a placeholder ("HK Bâtiment") pending the artisan's real name.
 
 ### Components
 - `components/StarRating.tsx`
@@ -41,6 +43,13 @@ French-language artisan marketplace for Côte d'Ivoire. Connects clients with tr
 - Day range filter: **1j** (today from midnight), 7j, 14j, 30j
 - `lib/track.ts` — fire-and-forget POST to `/api/events` (errors silently swallowed)
 - `app/api/events/route.ts` — inserts into Supabase `events` table using service role key
+
+### Photo upload (`/admin/upload`)
+*Multi-photo batch upload shipped July 27, 2026.*
+- `app/admin/upload/_content.tsx` — file input uses `multiple`; the admin selects several photos at once and sees a **thumbnail preview grid** before uploading. State holds an array of files (object-URL previews are revoked on change/unmount to avoid leaks).
+- **Sequential upload:** each file POSTs to `/api/upload` one at a time, with a live progress indicator on the button (`"Envoi X sur N…"`) — deliberate, since Côte d'Ivoire connections are slow.
+- **Partial-failure handling:** a file that fails is reported by name in a result panel; the batch continues rather than aborting. A final summary shows the total uploaded.
+- **`is_featured`:** optional, opt-in via checkbox, applied only to the **first** photo. `app/api/upload/route.ts` now reads the `is_featured` form field and persists it to the `portfolio_photos` row (**previously hardcoded `false`** — this fix makes the flag actually take effect).
 
 ---
 

@@ -111,6 +111,7 @@ Tailleur
    - Description → description (rewrite if needed — max 3 sentences, active voice, client-focused)
 
 4. **Upload portfolio photos** via `/admin/upload`
+   *(As of July 27, 2026 this page supports **multi-photo upload** — select and upload several photos in one action, not just a single file. Sequential upload with a progress indicator, thumbnail previews, and partial-failure handling. The `is_featured` flag is opt-in on the first photo and now persists correctly — `app/api/upload/route.ts` reads it from the form instead of hardcoding `false`. Technical details in CLAUDE.md → "Photo upload".)*
 
 5. **Verify on live app**
    Check `/search` and `/profiles/[id]` on mobile — confirm WhatsApp button works
@@ -162,7 +163,7 @@ Vous êtes, Nom de l'entreprise, Nom du contact, Numéro WhatsApp, Zones d'inter
 
 ## Current Priorities
 
-1. **Content** — reach 20–30 clean profiles before public launch (currently 43: 27 artisans + 16 companies, all approved — target met)
+1. **Content** — reach 20–30 clean profiles before public launch (currently 44: 28 artisans + 16 companies, all approved — target met)
 2. **SEO meta tags** — improve Google discoverability
 3. **Service worker** — offline PWA support for low-connectivity users
 4. **Monetization** — to be decided when profile count reaches 50+
