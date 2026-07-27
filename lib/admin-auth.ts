@@ -14,6 +14,20 @@ import { createHash, timingSafeEqual } from 'crypto';
 export const ADMIN_COOKIE = 'biso_admin';
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 30; // 30 days, in seconds
 
+/**
+ * "Ne pas suivre" cookie. When present, analytics events are not recorded —
+ * lets an admin browse/test without polluting the dashboard. Set via
+ * /admin/testmode?key=… and cleared with &off=1.
+ */
+export const NOTRACK_COOKIE = 'biso_admin_notrack';
+export const NOTRACK_MAX_AGE = 60 * 60 * 24 * 365; // ~1 year, in seconds
+
+/** True when the current request opts out of analytics tracking. */
+export async function isNotrack(): Promise<boolean> {
+  const cookieStore = await cookies();
+  return cookieStore.get(NOTRACK_COOKIE)?.value === 'true';
+}
+
 /** Constant-time string comparison that won't throw on length mismatch. */
 function safeEqual(a: string, b: string): boolean {
   const ab = Buffer.from(a);

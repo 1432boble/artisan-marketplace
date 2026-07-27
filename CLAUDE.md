@@ -26,6 +26,7 @@ French-language artisan marketplace for Côte d'Ivoire. Connects clients with tr
 | `/admin/profiles/new` | Admin only: Create new artisan/company profile. Includes other_services text input field. |
 | `/admin/upload` | Admin: upload portfolio photos — **multi-photo batch upload** (see "Photo upload" below) |
 | `/admin/reviews` | Admin: approve/reject reviews |
+| `/admin/testmode` | Admin: toggle analytics test mode via `?key=YOUR_KEY` (`&off=1` to clear) — see "Analytics test mode" below |
 | `/admin/analytics` | Admin: event analytics dashboard (1j/7j/14j/30j filters, Chart.js) |
 | `app/not-found.tsx` | Custom 404 page |
 
@@ -40,7 +41,13 @@ French-language artisan marketplace for Côte d'Ivoire. Connects clients with tr
 - Events tracked: `landing_view`, `search_view`, `profile_view`, `whatsapp_click`
 - Day range filter: **1j** (today from midnight), 7j, 14j, 30j
 - `lib/track.ts` — fire-and-forget POST to `/api/events` (errors silently swallowed)
-- `app/api/events/route.ts` — inserts into Supabase `events` table using service role key
+- `app/api/events/route.ts` — inserts into Supabase `events` table using service role key. **Skips the insert entirely** when the request carries the `biso_admin_notrack` cookie (see "Analytics test mode").
+
+### Analytics test mode (`/admin/testmode`)
+*Shipped July 27, 2026.* Lets an admin browse/test without polluting the analytics dashboard.
+- `app/admin/testmode/route.ts` — GET route handler. `?key=YOUR_KEY` (validated against `ADMIN_UPLOAD_KEY` via `checkPassword`) sets a long-lived (**~1 year**) `biso_admin_notrack=true` cookie — HttpOnly, SameSite=Lax, `Secure` in prod. `&off=1` clears it. Shows a plain French confirmation page either way; a bad key sets no cookie.
+- **Enforcement is server-side, at the single chokepoint.** All events flow through `track()` → `/api/events`, which calls `isNotrack()` (`lib/admin-auth.ts`) and returns early before inserting when the cookie is present. Visitors without the cookie are tracked exactly as before.
+- The cookie is per-browser — clearing cookies or using `&off=1` re-enables tracking.
 
 ### Photo upload (`/admin/upload`)
 *Multi-photo batch upload shipped July 27, 2026.*

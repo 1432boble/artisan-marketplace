@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { isNotrack } from '@/lib/admin-auth';
 
 export async function POST(request: Request) {
   try {
@@ -8,6 +9,11 @@ export async function POST(request: Request) {
 
     if (!event_type) {
       return NextResponse.json({ ok: false }, { status: 400 });
+    }
+
+    // Admin test mode: browsers carrying the opt-out cookie are not recorded.
+    if (await isNotrack()) {
+      return NextResponse.json({ ok: true });
     }
 
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
