@@ -24,6 +24,7 @@
 | May 15, 2026 | ~1h | PWA icons generated (512/192/180px): terracotta bg, white bold Georgia "Biso", ochre underline bar. manifest.json updated (name, short_name, theme_color). layout.tsx updated with manifest link, apple-touch-icon, theme-color meta. Multiple icon iterations to fix underline position and text padding. |
 | May 18, 2026 | ~15min | Fixed service name color on search cards — unified to terracotta #B03A1A for all profile types (was conditionally ochre for companies). Commit 26518a1. |
 | June 3, 2026 | ~1.5h | Security + tooling session. Closed unauthenticated admin API access, then replaced the `?key=` URL gate with an HttpOnly cookie session (`/admin/login` + `/admin` hub + logout, SHA-256 token in `lib/admin-auth.ts`). Added Husky pre-commit hook (blocks new console.log + TS errors), then cleared all 35 ESLint errors and enforced lint in the hook. Commits 5ab1f0e, 1d5fbac, ec913fd, f9fb7a6. |
+| July 26, 2026 | ~30min | Batch import: 15 profiles added via Supabase MCP (vCard export + Google Form responses). 13 single-service artisans (Peinture, Carrelage, Plomberie, Ferraillage, Nettoyage, Plâtrerie, Menuiserie bois), plus Kablan Entreprise (artisan, 6 services) and Djekpo Solidarité Construction CI (company, Piscine). All: status approved, is_available true, is_verified false, main_location/work_zones "Toute la Côte d'Ivoire", phone = whatsapp. 20 profile_services rows (15 primary). |
 
 ## How to Use This File
 - Update Labor Log at the end of every session
