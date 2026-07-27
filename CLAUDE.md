@@ -29,8 +29,6 @@ French-language artisan marketplace for Côte d'Ivoire. Connects clients with tr
 | `/admin/analytics` | Admin: event analytics dashboard (1j/7j/14j/30j filters, Chart.js) |
 | `app/not-found.tsx` | Custom 404 page |
 
-> **Live profiles (July 27, 2026): 44 approved** — 28 artisans + 16 companies. Latest: **HK Bâtiment** (artisan indépendant — Peinture + Peinture décorative/Enduits, Toute la Côte d'Ivoire, 10+ ans, WhatsApp `2250173700713`). `contact_name` is a placeholder ("HK Bâtiment") pending the artisan's real name.
-
 ### Components
 - `components/StarRating.tsx`
 - `components/TrackPageView.tsx` — fires `track(event)` on mount, renders nothing
