@@ -137,7 +137,8 @@ export default function SearchPage() {
             status
           )
         `)
-        .eq('status', 'approved');
+        .eq('status', 'approved')
+        .order('is_primary', { referencedTable: 'profile_services', ascending: false });
 
       if (error) {
         setErrorMessage(error.message);

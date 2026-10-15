@@ -86,6 +86,7 @@ export default function ProfilePage() {
           )
         `)
         .eq('id', id)
+        .order('is_primary', { referencedTable: 'profile_services', ascending: false })
         .single();
 
       if (!profileData) {
