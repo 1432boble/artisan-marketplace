@@ -24,9 +24,12 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_FR",
     siteName: "Biso",
+    images: [
+      { url: "/icon-512.png", width: 512, height: 512, alt: "Biso" },
+    ],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "Biso",
     description: "La communauté des pros de confiance près de chez vous.",
   },
