@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     locale: "fr_FR",
     siteName: "Biso",
     images: [
-      { url: "/icon-512.png", width: 512, height: 512, alt: "Biso" },
+      { url: "/og-thumb.png", width: 200, height: 200, alt: "Biso" },
     ],
   },
   twitter: {
