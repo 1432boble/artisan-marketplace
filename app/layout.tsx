@@ -10,9 +10,26 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://artisan-marketplace-phi.vercel.app"),
   title: "Biso",
   description: "La communauté des pros de confiance près de chez vous.",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+  openGraph: {
+    title: "Biso",
+    description: "La communauté des pros de confiance près de chez vous.",
+    type: "website",
+    locale: "fr_FR",
+    siteName: "Biso",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Biso",
+    description: "La communauté des pros de confiance près de chez vous.",
+  },
 };
 
 export default function RootLayout({
