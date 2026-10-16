@@ -371,6 +371,7 @@ export default function SearchPage() {
                     <a
                       href={`https://wa.me/${whatsappNumber}?text=Bonjour, je vous ai trouvé via la plateforme et je souhaite discuter de vos services.`}
                       target="_blank"
+                      rel="noopener noreferrer"
                       className="rounded-lg bg-green-600 px-4 py-2 text-sm font-[400] text-white"
                     >
                       WhatsApp

@@ -162,7 +162,7 @@ export default function ProfilePage() {
   }
 
   const whatsappNumber = cleanWhatsappNumber(profile.whatsapp);
-  const callNumber = cleanCallNumber(profile.whatsapp || profile.phone);
+  const callNumber = cleanCallNumber(profile.phone || profile.whatsapp);
 
   const averageRating =
     reviews.length > 0
@@ -361,6 +361,7 @@ export default function ProfilePage() {
             <a
               href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(WHATSAPP_PREFILL)}`}
               target="_blank"
+              rel="noopener noreferrer"
               onClick={() => track('whatsapp_click', id as string)}
               className="flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#25D366] py-4 font-[400] text-white"
             >
