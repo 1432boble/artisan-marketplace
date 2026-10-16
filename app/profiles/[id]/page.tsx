@@ -7,7 +7,17 @@ import { QRCodeCanvas } from 'qrcode.react';
 import StarRating from '@/components/StarRating';
 import { cleanWhatsappNumber } from '@/lib/whatsapp';
 import { ArrowLeft, Briefcase, MapPin, User } from 'lucide-react';
+import { IconBrandWhatsapp, IconPhone } from '@tabler/icons-react';
 import { track } from '@/lib/track';
+
+const WHATSAPP_PREFILL = "Bonjour, j'ai trouvé votre profil sur Biso.";
+
+/** Group a local 10-digit number (0XXXXXXXXX) into readable pairs: 07 67 61 22 78. */
+function formatLocalPhone(raw: string) {
+  const digits = (raw || '').replace(/\D/g, '');
+  const pairs = digits.match(/.{1,2}/g);
+  return pairs ? pairs.join(' ') : raw;
+}
 
 function cleanCallNumber(phone: string) {
   if (!phone) return '';
@@ -348,21 +358,23 @@ export default function ProfilePage() {
         <div className="flex flex-col gap-3">
           {whatsappNumber && (
             <a
-              href={`https://wa.me/${whatsappNumber}?text=Bonjour, je vous ai trouvé via Biso et je souhaite discuter de vos services.`}
+              href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(WHATSAPP_PREFILL)}`}
               target="_blank"
               onClick={() => track('whatsapp_click', id as string)}
-              className="block w-full rounded-xl bg-[#25D366] py-4 text-center font-[400] text-white"
+              className="flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#25D366] py-4 font-[400] text-white"
             >
-              WhatsApp
+              <IconBrandWhatsapp size={18} stroke={1.5} />
+              Écrire sur WhatsApp
             </a>
           )}
           {callNumber && (
             <a
               href={`tel:${callNumber}`}
               onClick={() => track('call_click', id as string)}
-              className="block w-full rounded-xl border-[1.5px] border-brand bg-white py-4 text-center font-[400] text-brand"
+              className="flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border-[1.5px] border-brand bg-white py-4 font-[400] text-brand"
             >
-              Appeler
+              <IconPhone size={18} stroke={1.5} />
+              Appeler le {formatLocalPhone(callNumber)}
             </a>
           )}
         </div>
