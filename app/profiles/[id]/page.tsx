@@ -10,7 +10,8 @@ import { ArrowLeft, Briefcase, MapPin, User } from 'lucide-react';
 import { IconBrandWhatsapp, IconPhone } from '@tabler/icons-react';
 import { track } from '@/lib/track';
 
-const WHATSAPP_PREFILL = "Bonjour, j'ai trouvé votre profil sur Biso.";
+const WHATSAPP_PREFILL =
+  'Bonjour, je vous ai trouvé via la plateforme Biso et je souhaite discuter de vos services.';
 
 /** Group a local 10-digit number (0XXXXXXXXX) into readable pairs: 07 67 61 22 78. */
 function formatLocalPhone(raw: string) {
