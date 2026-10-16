@@ -1,3 +1,11 @@
+/**
+ * Default pre-filled message for "contact the artisan" WhatsApp links.
+ * Use with encodeURIComponent in a wa.me `?text=` param. (The profile share
+ * link is intentionally separate — it carries the profile URL, not this text.)
+ */
+export const WHATSAPP_PREFILL =
+  'Bonjour, je vous ai trouvé via la plateforme Biso et je souhaite discuter de vos services.';
+
 export function cleanWhatsappNumber(phone: string): string {
   if (!phone) return '';
 

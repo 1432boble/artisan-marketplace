@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import StarRating from '@/components/StarRating';
-import { cleanWhatsappNumber } from '@/lib/whatsapp';
+import { cleanWhatsappNumber, WHATSAPP_PREFILL } from '@/lib/whatsapp';
 import { ArrowLeft, ChevronDown, MapPin } from 'lucide-react';
 import { track } from '@/lib/track';
 
@@ -369,7 +369,7 @@ export default function SearchPage() {
 
                   {whatsappNumber && (
                     <a
-                      href={`https://wa.me/${whatsappNumber}?text=Bonjour, je vous ai trouvé via la plateforme et je souhaite discuter de vos services.`}
+                      href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(WHATSAPP_PREFILL)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="rounded-lg bg-green-600 px-4 py-2 text-sm font-[400] text-white"

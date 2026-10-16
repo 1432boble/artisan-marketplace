@@ -5,13 +5,10 @@ import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { QRCodeCanvas } from 'qrcode.react';
 import StarRating from '@/components/StarRating';
-import { cleanWhatsappNumber } from '@/lib/whatsapp';
+import { cleanWhatsappNumber, WHATSAPP_PREFILL } from '@/lib/whatsapp';
 import { ArrowLeft, Briefcase, MapPin, User } from 'lucide-react';
 import { IconBrandWhatsapp, IconPhone } from '@tabler/icons-react';
 import { track } from '@/lib/track';
-
-const WHATSAPP_PREFILL =
-  'Bonjour, je vous ai trouvé via la plateforme Biso et je souhaite discuter de vos services.';
 
 /** Group a local 10-digit number (0XXXXXXXXX) into readable pairs: 07 67 61 22 78. */
 function formatLocalPhone(raw: string) {
