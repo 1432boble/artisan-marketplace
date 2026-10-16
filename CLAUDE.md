@@ -1,5 +1,5 @@
 # Biso — Claude Code Instructions
-*Last updated: June 3, 2026*
+*Last updated: October 16, 2026*
 
 ## This is NOT the Next.js you know
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
@@ -27,7 +27,7 @@ French-language artisan marketplace for Côte d'Ivoire. Connects clients with tr
 | `/admin/upload` | Admin: upload portfolio photos — **multi-photo batch upload** (see "Photo upload" below) |
 | `/admin/reviews` | Admin: approve/reject reviews |
 | `/admin/testmode` | Admin: toggle analytics test mode via `?key=YOUR_KEY` (`&off=1` to clear) — see "Analytics test mode" below |
-| `/admin/analytics` | Admin: event analytics dashboard (1j/7j/14j/30j filters, Chart.js) |
+| `/admin/analytics` | Admin: event analytics dashboard (single-day ‹ date › selector + 7j/14j/30j filters, Chart.js) |
 | `app/not-found.tsx` | Custom 404 page |
 
 ### Components
@@ -39,9 +39,10 @@ French-language artisan marketplace for Côte d'Ivoire. Connects clients with tr
 - `app/admin/analytics/page.tsx` — server component, auth guard via `ADMIN_UPLOAD_KEY`
 - `app/admin/analytics/_content.tsx` — client component, fetches from `/api/admin/events`
 - Events tracked: `landing_view`, `search_view`, `profile_view`, `whatsapp_click`
-- Day range filter: **1j** (today from midnight), 7j, 14j, 30j
-- `lib/track.ts` — fire-and-forget POST to `/api/events` (errors silently swallowed)
+- Date filter: a **single-day selector** replaces the old **1j** tab — `‹ Aujourd'hui ›` steps one day at a time (up to **30 days** back; `›` disabled on today; labels "Aujourd'hui" / "Hier" / short weekday + date like "Jeu. 15/10"). It sits next to the **unchanged 7j / 14j / 30j** range tabs. The selected single day filters on **local-midnight → next-local-midnight** bounds.
+- `lib/track.ts` — fire-and-forget and **non-blocking**: `navigator.sendBeacon` (events survive same-tab navigations like `tel:`), falling back to `fetch(..., { keepalive: true })`. Never awaited, never blocks navigation; errors silently swallowed.
 - `app/api/events/route.ts` — inserts into Supabase `events` table using service role key. **Skips the insert entirely** when the request carries the `biso_admin_notrack` cookie (see "Analytics test mode").
+- `app/api/admin/events/route.ts` (admin read) — returns events from the **last 31 days** and **paginates** with `.range()` in pages of 1000. PostgREST caps a single response at 1000 rows, so an unbounded query silently dropped recent events once `events` passed 1000 rows (fixed `af568e5`).
 
 ### Analytics test mode (`/admin/testmode`)
 *Shipped July 27, 2026.* Lets an admin browse/test without polluting the analytics dashboard.
@@ -68,7 +69,16 @@ French-language artisan marketplace for Côte d'Ivoire. Connects clients with tr
   - Design: terracotta `#B03A1A` bg with rounded corners, white bold Georgia "Biso" centered, ochre `#C8860A` rounded underline bar below text baseline.
   - Generated with a Node.js script using the `sharp` package. Script is deleted after each run — recreate from scratch if icons need to be regenerated.
 - **layout.tsx `<head>`** includes: `<link rel="manifest">`, `<link rel="apple-touch-icon">`, `<meta name="theme-color" content="#B03A1A">`.
-- Service worker is registered in `layout.tsx` via inline script (`/sw.js`).
+- Service worker (`public/sw.js`) is registered in `layout.tsx` via inline script. It is **self-clearing**: `skipWaiting` + `clients.claim` + deletes all Cache Storage, with a pass-through `fetch` handler — installable but caches nothing. (Real offline caching is not implemented yet.)
+
+---
+
+## Link previews & metadata (`app/layout.tsx`)
+
+- `metadataBase` = `https://artisan-marketplace-phi.vercel.app` so Open Graph / Twitter image URLs resolve absolutely (WhatsApp requires absolute URLs).
+- `openGraph` (title "Biso", site description, `type: website`, `locale: fr_FR`) + `twitter` (`card: summary`). `openGraph.images` → `public/og-thumb.png` (200×200 edge-to-edge terracotta "Biso") so WhatsApp shows a **small thumbnail**, not a wide banner.
+- `icons` → `/favicon.ico` (generated from `icon-512.png`) + `/apple-touch-icon.png`.
+- Per-page SEO (unique title/description per route) is **not implemented yet** — site-wide metadata only.
 
 ---
 
@@ -118,6 +128,8 @@ export const supabase = createClient(
 
 **For admin API routes:** always use `SUPABASE_SERVICE_ROLE_KEY` (not anon key, not NEXT_PUBLIC_).
 
+**Growing tables — filter + paginate.** PostgREST caps a single response at **1000 rows**. For any query over a table that grows unbounded (e.g. `events`), add a time/scope filter **and** paginate with `.range()` in pages of 1000 until a short page — never a single unbounded `select`, or recent rows silently vanish. (This bit the analytics dashboard — see Session Log `af568e5`.)
+
 ### Schema
 
 **`profiles`:** `id, profile_type, contact_name, company_name, phone, whatsapp, main_location, work_zones, description, experience_years, is_available, is_verified, status, created_at, other_services, main_service_name`
@@ -143,6 +155,10 @@ export const supabase = createClient(
 
 ### Profile & Content Rules
 - **`other_services`** — free text, optional. Displayed on `/profiles/[id]` below main services as inline muted text: `"Autres services · [value]"`. Not shown on search cards. Populated via admin form or directly in Supabase.
+- **Company profiles (`profile_type = 'company'`)** show the **company name as the title**; the contact name appears on the person-icon line. Descriptions should name **only the company**, not the contact. The profile title and the search card both key off `profile_type` — never swap `company_name`/`contact_name` in the data to fake it.
+- **Primary service first:** `profile_services` is ordered `is_primary DESC` in the profile and search queries — `.order('is_primary', { referencedTable: 'profile_services', ascending: false })`.
+- **`status = 'pending'` hides a profile from `/search` and `/api/get-profiles`** (both filter `status = 'approved'`), but it **stays reachable by direct `/profiles/[id]` URL** (that page fetches by id with no status filter). Use `pending` to park admin/test profiles.
+- **Contact buttons (`/profiles/[id]`):** "Écrire sur WhatsApp" uses the shared `WHATSAPP_PREFILL` (`lib/whatsapp.ts`), URL-encoded. "Appeler le …" dials `phone || whatsapp` (phone preferred) and shows the dialled number as local pairs (e.g. `07 67 61 22 78`). The profile **share** link is separate — it carries the profile URL, not the message.
 
 ### Admin auth — cookie session (no key in URL)
 - The admin password is the `ADMIN_UPLOAD_KEY` env var — server-side only, never `NEXT_PUBLIC_`. Use a long, random value (rotate it if it ever leaks).
@@ -196,6 +212,7 @@ export const supabase = createClient(
 - Do not expose sensitive env vars with `NEXT_PUBLIC_`
 - Do not commit `.env.local`, `.claude/`, or `.mcp.json`
 - Do not add features not discussed first — MVP focus until 500 profiles
+- Do not duplicate user-facing strings used in several places — put them in a shared module (e.g. `WHATSAPP_PREFILL` in `lib/whatsapp.ts`)
 - Do not make design changes without considering mobile first
 
 ---
@@ -212,6 +229,17 @@ export const supabase = createClient(
   - `@typescript-eslint/no-explicit-any`: warn (Supabase payloads are dynamic).
   - `react-hooks/set-state-in-effect`: warn (search page derives state in an effect).
 - **Known follow-ups** (currently warnings): generate Supabase types (`supabase gen types typescript`) to replace the `any`s; refactor the `/search` filter effect to `useMemo`; swap `<img>` for `next/image` where appropriate.
+
+## Session Log
+
+### 14–16 October 2026
+- **Data:** Added 4 Fadco-referred profiles — Eric Kobina Koffi (Électricité); Adouna Kossi (Plomberie — whatsapp `01 41 61 99 88` / phone `07 67 61 22 78`); Louguet Abdoul Aziz (Plomberie, 10+ ans); Cuisine Budget / Arnaud Tanon (Menuiserie bois + Plombier-gazier). Set **Test SARL** (admin test profile, `ac13c994-…`) to `pending`. Live totals: **47 real approved profiles** (31 artisans + 16 companies); **30 active services**.
+- **Commits:** `af568e5` analytics 1,000-row cap (31-day filter + `.range()` pagination); `8af4ae1` contact-button labels; `ce1b000` WhatsApp pre-fill copy; `60fbb7e` call button prefers phone + non-blocking `track()` + `rel="noopener"`; `6bec7a6` self-clearing service worker + shared WhatsApp constant (`lib/whatsapp.ts`); `feb3674` single-day selector on `/admin/analytics`; plus Open Graph / link-preview thumbnail + favicon.
+- **Conventions reaffirmed:** company profiles show the company name as title and descriptions mention only the company; strings reused in several places live in shared modules; Supabase queries on growing tables must filter + paginate; `pending` profiles are hidden from search but open by direct URL.
+- **Setup:** Supabase MCP uses a **scoped token (Project + Database only)** stored in gitignored `.mcp.json`; Claude Code installed natively.
+- **Next:** server-render `/search` (fixes lost taps on slow phones); per-page SEO; real offline caching; remove "Zone principale" from `/admin/profiles/new`; search-card service display (2/line, max 2 lines then "+ X autres").
+
+---
 
 ## After Every Session
 
