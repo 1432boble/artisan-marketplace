@@ -18,11 +18,33 @@ import {
   IconUser,
   IconBrandWhatsapp,
   IconChartLine,
+  IconChevronLeft,
+  IconChevronRight,
 } from '@tabler/icons-react';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
 
-type DayRange = 1 | 7 | 14 | 30;
+type RangeDays = 7 | 14 | 30;
+
+const MAX_DAYS_BACK = 30;
+const SHORT_WEEKDAYS = ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'];
+
+/** Local YYYY-MM-DD (not UTC) so keys line up with local-midnight boundaries. */
+function localDateKey(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+/** Day-selector label: "Aujourd'hui" / "Hier" / "Jeu. 15/10". */
+function formatDayLabel(offset: number, date: Date): string {
+  if (offset === 0) return "Aujourd'hui";
+  if (offset === 1) return 'Hier';
+  const dd = String(date.getDate()).padStart(2, '0');
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  return `${SHORT_WEEKDAYS[date.getDay()]} ${dd}/${mm}`;
+}
 
 interface EventRow {
   id: string;
@@ -54,7 +76,9 @@ const LABELS: Record<string, string> = {
 };
 
 export default function AnalyticsContent() {
-  const [days, setDays] = useState<DayRange>(7);
+  const [mode, setMode] = useState<'day' | 'range'>('day');
+  const [dayOffset, setDayOffset] = useState(0); // 0 = today … up to MAX_DAYS_BACK
+  const [rangeDays, setRangeDays] = useState<RangeDays>(7);
   const [events, setEvents] = useState<EventRow[]>([]);
   const [profiles, setProfiles] = useState<ProfileRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,24 +100,41 @@ export default function AnalyticsContent() {
       .finally(() => setLoading(false));
   }, []);
 
-  const cutoff = new Date();
-  if (days === 1) {
-    cutoff.setHours(0, 0, 0, 0);
-  } else {
-    cutoff.setDate(cutoff.getDate() - days);
-    cutoff.setHours(0, 0, 0, 0);
-  }
+  // Selected single day: local midnight → next local midnight.
+  const dayStart = new Date();
+  dayStart.setHours(0, 0, 0, 0);
+  dayStart.setDate(dayStart.getDate() - dayOffset);
+  const dayEnd = new Date(dayStart);
+  dayEnd.setDate(dayEnd.getDate() + 1);
+  const dayLabel = formatDayLabel(dayOffset, dayStart);
 
-  const filtered = events.filter((e) => new Date(e.created_at) >= cutoff);
+  // Range cutoff: N days back to local midnight (unchanged 7j/14j/30j logic).
+  const rangeCutoff = new Date();
+  rangeCutoff.setDate(rangeCutoff.getDate() - rangeDays);
+  rangeCutoff.setHours(0, 0, 0, 0);
+
+  const spanDays = mode === 'day' ? 1 : rangeDays;
+
+  const filtered =
+    mode === 'day'
+      ? events.filter((e) => {
+          const t = new Date(e.created_at);
+          return t >= dayStart && t < dayEnd;
+        })
+      : events.filter((e) => new Date(e.created_at) >= rangeCutoff);
 
   const count = (type: string) => filtered.filter((e) => e.event_type === type).length;
 
-  // Build ISO date keys for the selected range
+  // Build date keys for the chart.
   const dateKeys: string[] = [];
-  for (let i = days - 1; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    dateKeys.push(d.toISOString().slice(0, 10));
+  if (mode === 'day') {
+    dateKeys.push(localDateKey(dayStart));
+  } else {
+    for (let i = rangeDays - 1; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      dateKeys.push(d.toISOString().slice(0, 10));
+    }
   }
 
   const dateLabels = dateKeys.map((k) => {
@@ -101,17 +142,25 @@ export default function AnalyticsContent() {
     return `${dd}/${m}`;
   });
 
-  // Aggregate daily counts per event type
+  // Aggregate daily counts per event type.
   const daily: Record<string, Record<string, number>> = {};
   for (const key of dateKeys) {
     daily[key] = {};
     for (const t of EVENT_TYPES) daily[key][t] = 0;
   }
   const eventTypeSet = new Set<string>(EVENT_TYPES);
-  for (const e of filtered) {
-    const day = e.created_at.slice(0, 10);
-    if (daily[day] && eventTypeSet.has(e.event_type)) {
-      daily[day][e.event_type]++;
+  if (mode === 'day') {
+    // `filtered` is already exactly the selected local day → a single bucket.
+    const key = dateKeys[0];
+    for (const e of filtered) {
+      if (eventTypeSet.has(e.event_type)) daily[key][e.event_type]++;
+    }
+  } else {
+    for (const e of filtered) {
+      const day = e.created_at.slice(0, 10);
+      if (daily[day] && eventTypeSet.has(e.event_type)) {
+        daily[day][e.event_type]++;
+      }
     }
   }
 
@@ -124,7 +173,7 @@ export default function AnalyticsContent() {
       backgroundColor: COLORS[t] + '18',
       tension: 0.35,
       fill: false,
-      pointRadius: days <= 7 ? 4 : 2,
+      pointRadius: spanDays <= 7 ? 4 : 2,
       pointHoverRadius: 6,
       borderWidth: 2,
       // Distinct dash patterns so overlapping zero-lines are still identifiable
@@ -202,24 +251,75 @@ export default function AnalyticsContent() {
           <h1 className="text-2xl font-semibold" style={{ color: 'var(--ink)' }}>Analytics</h1>
         </div>
 
-        {/* Day range toggle */}
-        <div
-          className="mb-6 inline-flex overflow-hidden rounded-xl border"
-          style={{ borderColor: 'var(--border)' }}
-        >
-          {([1, 7, 14, 30] as DayRange[]).map((d) => (
+        {/* View selector: single-day stepper + range tabs */}
+        <div className="mb-6 flex flex-wrap items-center gap-2">
+          {/* Single-day selector */}
+          <div
+            className="inline-flex items-center overflow-hidden rounded-xl border"
+            style={{ borderColor: 'var(--border)' }}
+          >
             <button
-              key={d}
-              onClick={() => setDays(d)}
-              className="px-5 py-2 text-sm font-medium transition-colors"
+              type="button"
+              onClick={() => {
+                setMode('day');
+                setDayOffset((o) => Math.min(MAX_DAYS_BACK, o + 1));
+              }}
+              disabled={dayOffset >= MAX_DAYS_BACK}
+              aria-label="Jour précédent"
+              className="px-2 py-2 transition-colors disabled:opacity-30"
+              style={{ color: 'var(--ink)' }}
+            >
+              <IconChevronLeft size={18} stroke={1.5} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode('day')}
+              className="min-w-[96px] px-2 py-2 text-center text-sm font-medium transition-colors"
               style={{
-                background: days === d ? 'var(--brand)' : 'white',
-                color: days === d ? 'white' : 'var(--ink)',
+                background: mode === 'day' ? 'var(--brand)' : 'white',
+                color: mode === 'day' ? 'white' : 'var(--ink)',
               }}
             >
-              {d}j
+              {dayLabel}
             </button>
-          ))}
+            <button
+              type="button"
+              onClick={() => {
+                setMode('day');
+                setDayOffset((o) => Math.max(0, o - 1));
+              }}
+              disabled={dayOffset === 0}
+              aria-label="Jour suivant"
+              className="px-2 py-2 transition-colors disabled:opacity-30"
+              style={{ color: 'var(--ink)' }}
+            >
+              <IconChevronRight size={18} stroke={1.5} />
+            </button>
+          </div>
+
+          {/* Range tabs */}
+          <div
+            className="inline-flex overflow-hidden rounded-xl border"
+            style={{ borderColor: 'var(--border)' }}
+          >
+            {([7, 14, 30] as RangeDays[]).map((d) => (
+              <button
+                key={d}
+                type="button"
+                onClick={() => {
+                  setMode('range');
+                  setRangeDays(d);
+                }}
+                className="px-3 py-2 text-sm font-medium transition-colors"
+                style={{
+                  background: mode === 'range' && rangeDays === d ? 'var(--brand)' : 'white',
+                  color: mode === 'range' && rangeDays === d ? 'white' : 'var(--ink)',
+                }}
+              >
+                {d}j
+              </button>
+            ))}
+          </div>
         </div>
 
         {loading && (
