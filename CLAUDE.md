@@ -20,7 +20,7 @@ French-language artisan marketplace for Côte d'Ivoire. Connects clients with tr
 | Route | Description |
 |---|---|
 | `/` | Landing page |
-| `/search` | Search page — fetches services live from Supabase |
+| `/search` | Search page — fetches services live from Supabase. Default order = photos → approved reviews → newest (`lib/search-order.ts`, applied after filters) |
 | `/profiles/[id]` | Full artisan profile |
 | `/artisan` | Artisan registration — two CTA buttons both linking to https://forms.gle/HrweW6rg45NZQvtEA: (1) hero section — white bg, terracotta text #B03A1A, font-weight 500, border-radius 12px, box-shadow; (2) bottom of page — full-width, terracotta bg, white text |
 | `/admin/profiles/new` | Admin only: Create new artisan/company profile. Includes other_services text input field. |

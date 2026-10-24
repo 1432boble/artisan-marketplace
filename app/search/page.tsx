@@ -7,6 +7,7 @@ import StarRating from '@/components/StarRating';
 import { cleanWhatsappNumber, WHATSAPP_PREFILL } from '@/lib/whatsapp';
 import { ArrowLeft, ChevronDown, MapPin } from 'lucide-react';
 import { track } from '@/lib/track';
+import { sortByCompleteness } from '@/lib/search-order';
 
 
 const ZONE_SELECT_OPTIONS = [
@@ -135,7 +136,8 @@ export default function SearchPage() {
           reviews (
             rating,
             status
-          )
+          ),
+          portfolio_photos ( count )
         `)
         .eq('status', 'approved')
         .order('is_primary', { referencedTable: 'profile_services', ascending: false });
@@ -163,7 +165,7 @@ export default function SearchPage() {
 
   useEffect(() => {
     if (!serviceFilter && !zoneFilter && typeFilter === 'all') {
-      setFiltered(artisans);
+      setFiltered(sortByCompleteness(artisans));
       return;
     }
 
@@ -196,7 +198,7 @@ export default function SearchPage() {
       result = result.filter((a) => a.profile_type === typeFilter);
     }
 
-    setFiltered(result);
+    setFiltered(sortByCompleteness(result));
   }, [serviceFilter, zoneFilter, typeFilter, artisans]);
 
   const TYPE_CHIPS: { value: TypeFilter; label: string }[] = [
