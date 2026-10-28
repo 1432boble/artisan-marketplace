@@ -20,6 +20,7 @@ import {
   IconChartLine,
   IconChevronLeft,
   IconChevronRight,
+  IconSearchOff,
 } from '@tabler/icons-react';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
@@ -50,6 +51,7 @@ interface EventRow {
   id: string;
   event_type: string;
   profile_id: string | null;
+  metadata: { query?: unknown } | null;
   created_at: string;
 }
 
@@ -229,6 +231,16 @@ export default function AnalyticsContent() {
   const top5Views = topProfiles('profile_view');
   const top5WA = topProfiles('whatsapp_click');
 
+  // Service searches that matched nothing → candidates for new keywords.
+  const unmatchedTerms = (() => {
+    const acc: Record<string, number> = {};
+    for (const e of filtered) {
+      const q = e.event_type === 'search_unmatched' ? e.metadata?.query : undefined;
+      if (typeof q === 'string' && q) acc[q] = (acc[q] ?? 0) + 1;
+    }
+    return Object.entries(acc).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  })();
+
   const profileName = (id: string) => {
     const p = profiles.find((p) => p.id === id);
     return p?.company_name || p?.contact_name || id.slice(0, 8) + '…';
@@ -376,6 +388,17 @@ export default function AnalyticsContent() {
                 rankColor="#16A34A"
                 countColor="#16A34A"
                 nameOf={profileName}
+              />
+            </div>
+
+            <div className="mt-4">
+              <TopList
+                title="Recherches sans résultat"
+                icon={<IconSearchOff size={18} stroke={1.5} style={{ color: 'var(--accent)' }} />}
+                items={unmatchedTerms}
+                rankColor="var(--accent)"
+                countColor="var(--accent)"
+                nameOf={(term) => term}
               />
             </div>
           </>

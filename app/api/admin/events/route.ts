@@ -6,6 +6,7 @@ type EventRow = {
   id: number;
   event_type: string;
   profile_id: string | null;
+  metadata: Record<string, unknown> | null;
   created_at: string;
 };
 
@@ -42,7 +43,7 @@ export async function GET() {
   for (;;) {
     const { data, error } = await supabase
       .from('events')
-      .select('id, event_type, profile_id, created_at')
+      .select('id, event_type, profile_id, metadata, created_at')
       .gte('created_at', since)
       .order('created_at', { ascending: true })
       .range(offset, offset + PAGE_SIZE - 1);

@@ -5,9 +5,11 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import StarRating from '@/components/StarRating';
 import { cleanWhatsappNumber, WHATSAPP_PREFILL } from '@/lib/whatsapp';
-import { ArrowLeft, ChevronDown, MapPin } from 'lucide-react';
+import { ArrowLeft, MapPin } from 'lucide-react';
+import { IconChevronDown } from '@tabler/icons-react';
 import { track } from '@/lib/track';
 import { sortByCompleteness } from '@/lib/search-order';
+import ServiceCombobox from '@/components/ServiceCombobox';
 
 
 const ZONE_SELECT_OPTIONS = [
@@ -80,8 +82,9 @@ function CustomSelect({
         className="flex w-full items-center justify-between rounded-xl border-[1.5px] border-brand bg-white px-4 py-3 font-[400] text-brand"
       >
         <span className={selectedLabel ? '' : 'opacity-60'}>{selectedLabel || placeholder}</span>
-        <ChevronDown
+        <IconChevronDown
           size={16}
+          stroke={1.5}
           className={`shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
         />
       </button>
@@ -228,14 +231,10 @@ export default function SearchPage() {
         </p>
 
         <div className="mt-3 grid gap-2">
-          <CustomSelect
+          <ServiceCombobox
             value={serviceFilter}
             onChange={setServiceFilter}
-            options={[
-              { label: 'Tous les services', value: 'ALL_SERVICES' },
-              ...services.map((s) => ({ label: s, value: s })),
-            ]}
-            placeholder="Choisir un service"
+            services={services}
           />
           <CustomSelect
             value={zoneFilter}

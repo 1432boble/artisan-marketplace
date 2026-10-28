@@ -33,12 +33,14 @@ French-language artisan marketplace for Côte d'Ivoire. Connects clients with tr
 ### Components
 - `components/StarRating.tsx`
 - `components/TrackPageView.tsx` — fires `track(event)` on mount, renders nothing
+- `components/ServiceCombobox.tsx` — typeable service dropdown on `/search` (see "Service keywords" below). Zone dropdown is still the local `CustomSelect`.
 - No gallery component — portfolio gallery is inline in `app/profiles/[id]/page.tsx`
 
 ### Analytics
 - `app/admin/analytics/page.tsx` — server component, auth guard via `ADMIN_UPLOAD_KEY`
 - `app/admin/analytics/_content.tsx` — client component, fetches from `/api/admin/events`
-- Events tracked: `landing_view`, `search_view`, `profile_view`, `whatsapp_click`
+- Events tracked: `landing_view`, `search_view`, `profile_view`, `whatsapp_click`, `search_unmatched`
+- `search_unmatched` — a typed service query (3+ chars) that matched no service, sent after a 1.5 s typing pause, once per query per session. `metadata.query` = normalized text, max 60 chars; queries with 6+ digits (phone numbers) are never logged — enforced by `toLoggableQuery()` in the browser **and** in `/api/events`. Shown on `/admin/analytics` as "Recherches sans résultat" (top 10 terms for the selected period).
 - Date filter: a **single-day selector** replaces the old **1j** tab — `‹ Aujourd'hui ›` steps one day at a time (up to **30 days** back; `›` disabled on today; labels "Aujourd'hui" / "Hier" / short weekday + date like "Jeu. 15/10"). It sits next to the **unchanged 7j / 14j / 30j** range tabs. The selected single day filters on **local-midnight → next-local-midnight** bounds.
 - `lib/track.ts` — fire-and-forget and **non-blocking**: `navigator.sendBeacon` (events survive same-tab navigations like `tel:`), falling back to `fetch(..., { keepalive: true })`. Never awaited, never blocks navigation; errors silently swallowed.
 - `app/api/events/route.ts` — inserts into Supabase `events` table using service role key. **Skips the insert entirely** when the request carries the `biso_admin_notrack` cookie (see "Analytics test mode").
@@ -49,6 +51,13 @@ French-language artisan marketplace for Côte d'Ivoire. Connects clients with tr
 - `app/admin/testmode/route.ts` — GET route handler. `?key=YOUR_KEY` (validated against `ADMIN_UPLOAD_KEY` via `checkPassword`) sets a long-lived (**~1 year**) `biso_admin_notrack=true` cookie — HttpOnly, SameSite=Lax, `Secure` in prod. `&off=1` clears it. Shows a plain French confirmation page either way; a bad key sets no cookie.
 - **Enforcement is server-side, at the single chokepoint.** All events flow through `track()` → `/api/events`, which calls `isNotrack()` (`lib/admin-auth.ts`) and returns early before inserting when the cookie is present. Visitors without the cookie are tracked exactly as before.
 - The cookie is per-browser — clearing cookies or using `&off=1` re-enables tracking.
+
+### Service keywords (`lib/service-keywords.ts`)
+- `SERVICE_KEYWORDS` maps each `services.name_fr` (exact key) to client-facing words ("clim", "fuite", "bonbonne"…). A service with no entry still matches on its name, so adding a service in Supabase needs no code change.
+- `normalize()` — lowercase, accents stripped, `’` → `'`, hyphens → spaces, spaces collapsed.
+- `matchServices(query, services)` — from 2 chars. Rank: query **is** the name or a keyword (whole phrase) > name starts with query > name contains query > keyword match (query inside a keyword, or a keyword as **whole words** inside the query; a typed word may add a plural `s`/`x`). Whole-word matching stops "gazon" → Plombier-gazier, "entreprise" → Électricité.
+- Selecting a service applies the **unchanged** exact-match filter. `''` = no service chosen (initial state, also what the clear button sets); `ALL_SERVICES` = "Tous les services" / "Voir tous les artisans".
+- To grow the list: check "Recherches sans résultat" on `/admin/analytics` and add terms here.
 
 ### Photo upload (`/admin/upload`)
 *Multi-photo batch upload shipped July 27, 2026.*

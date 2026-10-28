@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { isNotrack } from '@/lib/admin-auth';
+import { toLoggableQuery } from '@/lib/service-keywords';
 
 export async function POST(request: Request) {
   try {
@@ -16,6 +17,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true });
     }
 
+    // Free text from the public search box: re-check it server-side.
+    let safeMetadata = metadata ?? null;
+    if (event_type === 'search_unmatched') {
+      const query = typeof metadata?.query === 'string' ? toLoggableQuery(metadata.query) : null;
+      if (!query) return NextResponse.json({ ok: true });
+      safeMetadata = { query };
+    }
+
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!url || !key) return NextResponse.json({ ok: true });
@@ -25,7 +34,7 @@ export async function POST(request: Request) {
     await supabase.from('events').insert({
       event_type,
       profile_id: profile_id ?? null,
-      metadata: metadata ?? null,
+      metadata: safeMetadata,
     });
 
     return NextResponse.json({ ok: true });
