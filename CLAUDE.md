@@ -161,6 +161,7 @@ export const supabase = createClient(
 - Service names are case-sensitive. Always use exact `name_fr` values.
 - Search filter uses exact match: `.some(ps => ps.services?.name_fr === serviceFilter)` — never `.includes()`.
 - **Current count: 30 services.** Added Graphisme, Jardinage, Paysagisme, Photographie, Piscine, Plombier-gazier; replaced Panneaux solaires with Energie Renouvelable. Full list in `biso_project_instructions.md`.
+- **When services change, update everything in sync:** Supabase `services` → `lib/service-keywords.ts` → Google Form → `/admin/profiles/new` → `biso_project_instructions.md` → this file → biso-profile skill. A new service still matches on its name in the search dropdown, but a renamed service loses its keywords until `lib/service-keywords.ts` is updated — its keys must match `services.name_fr` exactly.
 
 ### Profile & Content Rules
 - **`other_services`** — free text, optional. Displayed on `/profiles/[id]` below main services as inline muted text: `"Autres services · [value]"`. Not shown on search cards. Populated via admin form or directly in Supabase.

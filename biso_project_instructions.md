@@ -73,7 +73,7 @@ One font family throughout: **Fraunces** (Google Fonts). No other font.
 | Route | Description |
 |---|---|
 | `/` | Landing page |
-| `/search` | Search artisans by service and zone (shows all approved by default) |
+| `/search` | Search artisans by service and zone (shows all approved by default). Typeable service dropdown with keyword matching; unmatched searches appear in `/admin/analytics` under "Recherches sans résultat" |
 | `/profiles/[id]` | Full profile — reviews, portfolio, WhatsApp + Call buttons, QR code, share |
 | `/artisan` | Artisan registration page — explains Biso, links to Google Form |
 | `/admin/profiles/new` | **Admin:** create a new artisan/company profile |
@@ -161,7 +161,8 @@ It also invites written or voice-note replies, suggests sharing the link with sa
 ### Services list (30 — must match `services.name_fr` exactly)
 Architecte, Architecte d'intérieur, Carrelage, Charpenterie, Coffrage, Démolition, Domotique, Électricité, Energie Renouvelable, Étanchéité, Excavation, Ferraillage, Froid & Climatisation, Graphisme, Jardinage, Maçonnerie, Mécanique, Menuiserie aluminium, Menuiserie bois, Menuiserie métallique, Nettoyage, Paysagisme, Peinture, Photographie, Piscine, Plâtrerie, Plomberie, Plombier-gazier, Sécurité électronique, Tailleur
 
-When services change, update everything in sync: Supabase `services` → Google Form → `/admin/profiles/new` → this file → `CLAUDE.md` → biso-profile skill.
+When services change, update everything in sync: Supabase `services` → `lib/service-keywords.ts` → Google Form → `/admin/profiles/new` → this file → `CLAUDE.md` → biso-profile skill.
+A new service still matches on its name in the search dropdown, but a renamed service loses its keywords until `lib/service-keywords.ts` is updated — its keys must match `services.name_fr` exactly.
 
 ---
 
